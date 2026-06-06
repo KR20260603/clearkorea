@@ -314,7 +314,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `docs(auth): sync Kakao Naver launch policy` | Files: `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, optional env/contribution docs
 
-- [ ] 3. Create Supabase Schema, RLS, Types, And Local Client Boundaries
+- [x] 3. Create Supabase Schema, RLS, Types, And Local Client Boundaries
 
   **What to do**: Add Supabase CLI config, migrations for every table in `PLAN.md`, enums, indexes, counter snapshots, audit logs, settings, RLS policies, storage buckets, seed data, generated TypeScript database types, and explicit policy fixtures for Kakao/Naver users, admins, super admins, anonymous public reads, and development/test guest bypass. Link to the existing Supabase project ID only through local config or instructions that avoid secrets.
   **Must NOT do**: Do not commit DB password, allowlist emails, API keys, or generated secret-bearing files.
@@ -327,12 +327,12 @@ Wave 6: Task 16
   - External: Context7 `/supabase/supabase`, `/supabase/cli`, `/supabase/ssr`.
 
   **Acceptance Criteria**:
-  - [ ] Supabase migrations create all planned tables and enum constraints.
-  - [ ] RLS policies cover Kakao/Naver authenticated users, development/test guest fixtures, admins, super admins, and anonymous public reads.
-  - [ ] Generated DB types compile with `pnpm typecheck`.
-  - [ ] Seed data includes affected stations and baseline settings without secrets.
-  - [ ] SQL tests or CLI checks prove production anonymous/guest identities cannot write voices, reports, or admin-only rows.
-  - [ ] SQL tests or CLI checks prove development/test guest fixtures work only when explicit non-production configuration is enabled.
+  - [x] Supabase migrations create all planned tables and enum constraints.
+  - [x] RLS policies cover Kakao/Naver authenticated users, development/test guest fixtures, admins, super admins, and anonymous public reads.
+  - [x] Generated DB types compile with `pnpm typecheck`.
+  - [x] Seed data includes affected stations and baseline settings without secrets.
+  - [x] SQL tests or CLI checks prove production anonymous/guest identities cannot write voices, reports, or admin-only rows.
+  - [x] SQL tests or CLI checks prove development/test guest fixtures work only when explicit non-production configuration is enabled.
 
   **QA Scenarios**:
   ```
