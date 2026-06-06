@@ -1,11 +1,11 @@
 # ClearKorea Scaffold And Build Plan
 
 ## TL;DR
-> **Summary**: Scaffold the full ClearKorea v1 app from the current planning/prototype baseline into a production-ready Next.js App Router application, preserving the civic safety constraints and implementing the entire v1 scope in one initial build.
-> **Deliverables**: Next.js/React/Tailwind scaffold, Supabase schema/RLS/auth, five-tab app, admin workflows, feeds/Cron, moderation agents, observability, deployment readiness, and readable Conventional Commit rules.
+> **Summary**: Scaffold the full ClearKorea v1 app from the current planning/prototype baseline into a production-ready Next.js App Router application, preserving the civic safety constraints and the revised Kakao/Naver-only production identity gate.
+> **Deliverables**: Next.js/React/Tailwind scaffold, Supabase schema/RLS/auth with Kakao/Naver production login only, five-tab app, admin workflows, feeds/Cron, moderation agents, observability, deployment readiness, and readable Conventional Commit rules.
 > **Effort**: XL
-> **Parallel**: YES - 5 waves
-> **Critical Path**: Task 1 -> Task 2 -> Task 3 -> Task 4 -> Tasks 5-15 -> Task 16
+> **Parallel**: YES - 6 waves
+> **Critical Path**: Task 1 -> Task 2 -> Task 2A -> Task 2B -> Tasks 3-4 -> Tasks 5-15 -> Task 16
 
 ## Context
 ### Original Request
@@ -35,13 +35,20 @@
 - Momus-style high accuracy review verdict: `OKAY`.
 - Latest user constraints verified: `$omo:frontend-ui-ux` is mandatory for frontend/SVG/graphic design work, Windows QA avoids `tmux`, browser QA uses Codex Browser/browser-use, and the plan still covers scaffolding, Conventional Commits, and full v1 build scope.
 
+### Plan Revision: Auth Gate And Landing Cleanup
+- New user decision: production launch must remove user-facing guest login and require identity-linked participation through Kakao or Naver OAuth only.
+- Guest-like access may remain only as a development/test convenience for multi-account QA and must be disabled in production launch mode.
+- Google OAuth is removed from production auth scope. This does not affect Google News RSS feed collection.
+- Admin bootstrap must stop using Google verified email allowlists and instead use env-only, provider-qualified Kakao/Naver identity identifiers or super-admin approval flows.
+- Landing cleanup must remove the duplicate header GitHub button and keep one GitHub/contribution affordance in content/footer.
+
 ## Work Objectives
 ### Core Objective
 Build the complete ClearKorea v1 web application from the current prototype baseline without deferring documented v1 scope.
 
 ### Deliverables
 - Production Next.js 16.2 line scaffold with React 19, TypeScript, Tailwind, pnpm, `src/`, App Router route groups, shadcn/ui, and strict lint/test tooling.
-- Supabase migrations, RLS, type generation, auth/session helpers, guest identity, OAuth flow support, admin role bootstrap, and audit logs.
+- Supabase migrations, RLS, type generation, auth/session helpers, Kakao/Naver OAuth, development-only guest/test bypass controls, admin role bootstrap, and audit logs.
 - Public landing, five-tab app shell, Square, Rallies, Live, News, affected stations, admin queues, moderation settings, feeds, Cron jobs, and agent-backed operational flows.
 - Observability/deployment baseline with PostHog, Turnstile, Vercel, Cloudflare, uptime checks, spend caps, and no Sentry/Redis baseline.
 - Conventional Commit rules and commit templates that produce readable multi-line commit messages.
@@ -56,6 +63,7 @@ Build the complete ClearKorea v1 web application from the current prototype base
 - `pnpm build` exits 0.
 - `node scripts/check-feeds.mjs config/feeds.json` exits 0 or any pre-existing dead required feed is documented before feature work starts.
 - Local dev server browser QA confirms `/`, `/app`, `/app/stations`, `/admin`, `robots.txt`, and `sitemap.xml` behavior.
+- Launch-mode QA proves guest participation is disabled, Google OAuth is absent from UI/config, and Kakao/Naver OAuth entry points are the only production login choices.
 - No secrets, admin allowlist emails, API keys, DB passwords, or deployment tokens appear in tracked files or commit messages.
 
 ### Must Have
@@ -68,6 +76,9 @@ Build the complete ClearKorea v1 web application from the current prototype base
 - Preserve affected polling station disclaimer that the list summarizes administrative failures and does not prove election fraud.
 - Keep feed checker dependency-free.
 - Use PostHog as default analytics/error-tracking path.
+- Production participation requires Kakao or Naver OAuth account linking; no public guest posting or guest login at launch.
+- Development/test guest bypass is allowed only behind explicit non-production configuration and must be impossible in production launch mode.
+- Admin bootstrap uses env-only provider-qualified Kakao/Naver identity identifiers or explicit super-admin approval, not Google verified email.
 - Use `$omo:frontend-ui-ux` explicitly before frontend UI, SVG image, raster image, visual design, layout, motion, or graphic polish work.
 - For design work, require a written aesthetic direction before implementation: purpose, tone, constraints, and the one memorable differentiator.
 
@@ -75,9 +86,12 @@ Build the complete ClearKorea v1 web application from the current prototype base
 - No source or docs containing secret values or allowlist email values.
 - No Sentry baseline.
 - No Redis or separate in-memory cache baseline.
-- No `assets/pwa-icon.ico`.
+- No `public/pwa-icon.ico`.
 - No source claim that organized election fraud is established fact.
 - No doxxing, individual tracking, unlawful organizing, or private retaliation workflows.
+- No production Google OAuth login path.
+- No production user-facing guest login, guest posting, or guest reporting path.
+- Do not remove or confuse Google News RSS feed ingestion; that is unrelated to Google OAuth.
 - No auto-commit without explicit approval.
 
 ## Verification Strategy
@@ -93,29 +107,33 @@ Build the complete ClearKorea v1 web application from the current prototype base
 > Target: 5-8 tasks per wave. Dependencies below define exact safe parallelism.
 
 Wave 1: Task 1
-Wave 2: Tasks 2, 3, 4
-Wave 3: Tasks 5, 6, 7, 8, 9
-Wave 4: Tasks 10, 11, 12, 13, 14, 15
-Wave 5: Task 16
+Wave 2: Task 2
+Wave 2 Repair: Tasks 2A, 2B
+Wave 3: Tasks 3, 4
+Wave 4: Tasks 5, 6, 7, 8, 9
+Wave 5: Tasks 10, 11, 12, 13, 14, 15
+Wave 6: Task 16
 
 ### Dependency Matrix
 | Task | Blocks | Blocked By |
 | --- | --- | --- |
 | 1 | 2, 3, 4 | none |
-| 2 | 5, 6, 7, 8, 9, 10, 11, 12 | 1 |
-| 3 | 5, 6, 7, 8, 9, 10, 11, 12 | 1 |
-| 4 | 5, 6, 7, 8, 9 | 1 |
-| 5 | 10, 16 | 2, 3, 4 |
-| 6 | 10, 13, 16 | 2, 3, 4 |
-| 7 | 13, 14, 16 | 2, 3, 4 |
-| 8 | 12, 16 | 2, 3, 4 |
-| 9 | 12, 16 | 2, 3, 4 |
-| 10 | 13, 14, 16 | 2, 5, 6 |
-| 11 | 13, 14, 16 | 2, 3 |
-| 12 | 16 | 2, 8, 9 |
+| 2 | 2A | 1 |
+| 2A | 2B | 2 |
+| 2B | 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15 | 2A |
+| 3 | 5, 6, 7, 8, 9, 10, 11, 12 | 1, 2B |
+| 4 | 5, 6, 7, 8, 9 | 1, 2B |
+| 5 | 10, 16 | 2B, 3, 4 |
+| 6 | 10, 13, 16 | 2B, 3, 4 |
+| 7 | 13, 14, 16 | 2B, 3, 4 |
+| 8 | 12, 16 | 2B, 3, 4 |
+| 9 | 12, 16 | 2B, 3, 4 |
+| 10 | 13, 14, 16 | 2B, 5, 6 |
+| 11 | 13, 14, 16 | 2B, 3, 5 |
+| 12 | 16 | 2B, 5, 8, 9 |
 | 13 | 16 | 6, 7, 10, 11 |
 | 14 | 16 | 7, 10, 11 |
-| 15 | 16 | 2 |
+| 15 | 16 | 2B |
 | 16 | final | all prior tasks |
 
 ## TODOs
@@ -124,7 +142,7 @@ Wave 5: Task 16
 
 - [x] 1. Scaffold Next.js Workspace, Tooling, And Commit Policy
 
-  **What to do**: Initialize the app scaffold in-place using pnpm and the Next.js 16.2 patch line with App Router, TypeScript, Tailwind, ESLint, `src/`, and import alias. Add Vitest, Testing Library, lint/typecheck/build scripts, `commitlint` or an equivalent commit-msg check, and a `CONVENTIONAL_COMMITS.md` or contribution section describing readable multi-line Conventional Commit messages. Preserve existing docs/assets/config/prototypes/scripts. Do not move prototype files into `src/` yet.
+  **What to do**: Initialize the app scaffold in-place using pnpm and the Next.js 16.2 patch line with App Router, TypeScript, Tailwind, ESLint, `src/`, and import alias. Add Vitest, Testing Library, lint/typecheck/build scripts, `commitlint` or an equivalent commit-msg check, and a `CONVENTIONAL_COMMITS.md` or contribution section describing readable multi-line Conventional Commit messages. Preserve existing docs/config/prototypes/scripts. Do not move prototype files into `src/` yet.
   **Must NOT do**: Do not print `.env`; do not delete root docs or prototype files; do not add `pwa-icon.ico`; do not commit automatically.
 
   **Parallelization**: Can Parallel: NO | Wave 1 | Blocks: 2-16 | Blocked By: none
@@ -177,7 +195,7 @@ Wave 5: Task 16
   **What to do**: Build root layout, route groups, metadata, `robots.ts`, `sitemap.ts`, app providers, design tokens, responsive shell, footer GitHub link, PWA manifest, favicon/icon references, OG metadata, and asset references. Landing text must render as HTML, not baked into raster images.
   **Must NOT do**: Do not make a marketing-only placeholder app; do not overuse raster where SVG/HTML/CSS works; do not change public claims without aligning English/Korean copy.
 
-  **Parallelization**: Can Parallel: YES | Wave 2 | Blocks: 5-12 | Blocked By: 1
+  **Parallelization**: Can Parallel: YES | Wave 2 | Blocks: 2A | Blocked By: 1
 
   **References**:
   - Pattern: `IMAGE.md` - SVG-first brand and raster asset uses.
@@ -189,9 +207,10 @@ Wave 5: Task 16
   **Acceptance Criteria**:
   - [ ] Before implementation, executor records a `$omo:frontend-ui-ux` aesthetic direction covering purpose, tone, constraints, and one memorable differentiator.
   - [ ] `/` has SEO metadata, OG image, `hreflang` en/ko, Organization JSON-LD, and an Enter CTA.
+  - [ ] Landing has exactly one GitHub/contribution affordance and it is not duplicated in the header navigation.
   - [ ] `/robots.txt` allows landing/public routes and disallows `/app` and `/admin`.
   - [ ] `/sitemap.xml` includes public landing routes only.
-  - [ ] PWA manifest uses name `ClearKorea`, theme/background `#0A0A0A`, and `assets/pwa-icon.png`.
+  - [ ] PWA manifest uses name `ClearKorea`, theme/background `#0A0A0A`, and `public/pwa-icon.png`.
   - [ ] Footer exposes `https://github.com/KR20260603/clearkorea`.
 
   **QA Scenarios**:
@@ -211,12 +230,87 @@ Wave 5: Task 16
 
   **Commit**: YES | Message: `feat(shell): add branded app foundation` | Files: `src/app/**`, `src/components/**`, `src/styles/**`, metadata files
 
+- [ ] 2A. Correct Landing GitHub Affordance And Public Asset Contract
+
+  **What to do**: Repair the partially completed landing shell so it matches the revised visual/product contract. Remove the duplicate header GitHub button, keep exactly one GitHub/contribution link in content or footer, verify the public asset contract stores brand files directly under `public/`, and use root static URLs such as `/pwa-icon.svg`, `/hero.png`, and `/og.png`.
+  **Must NOT do**: Do not keep two GitHub buttons; do not leave a lone header GitHub CTA; do not add a custom asset route-handler workaround unless static `public/` serving is impossible; do not recreate a root `assets/` directory or a nested `public/assets/` directory.
+
+  **Parallelization**: Can Parallel: NO | Wave 2 Repair | Blocks: 2B, 3-16 | Blocked By: 2
+
+  **References**:
+  - Pattern: `src/app/(marketing)/page.tsx` - current landing has a header GitHub action and a second CTA GitHub action; remove the header one.
+  - Pattern: `public/` - canonical brand asset location and Next.js static root.
+  - Pattern: `IMAGE.md`, `PLAN.md` - generated asset names remain source/brand references.
+  - Skill: `$omo:frontend-ui-ux` - mandatory for the action hierarchy and screenshot review.
+
+  **Acceptance Criteria**:
+  - [ ] `/` renders exactly one link to `https://github.com/KR20260603/clearkorea`.
+  - [ ] The remaining GitHub/contribution link is not in the top header/nav.
+  - [ ] `/pwa-icon.svg`, `/hero.png`, and `/hero-mobile.png` return HTTP 200 from static public assets.
+  - [ ] No `assets/` or `public/assets/` directory exists after the migration.
+  - [ ] No custom asset route handler exists unless the executor documents why static public assets cannot work.
+  - [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` exit 0.
+
+  **QA Scenarios**:
+  ```
+  Scenario: Landing has one GitHub affordance
+    Tool: Codex Browser/browser-use
+    Steps: open http://127.0.0.1:3000/; count visible and DOM GitHub links; capture screenshot
+    Expected: exactly one GitHub link exists and header/nav has none
+    Evidence: .omo/evidence/task-2a-single-github.png
+
+  Scenario: Public brand assets load
+    Tool: curl
+    Steps: curl -I http://127.0.0.1:3000/pwa-icon.svg; curl -I http://127.0.0.1:3000/hero.png; curl -I http://127.0.0.1:3000/hero-mobile.png
+    Expected: all responses are HTTP 200 and served as static assets
+    Evidence: .omo/evidence/task-2a-assets.txt
+  ```
+
+  **Commit**: YES | Message: `fix(shell): align landing actions and assets` | Files: `src/app/(marketing)/**`, `public/**`, tests as needed
+
+- [ ] 2B. Sync Auth Policy Across Docs And Plan Contracts
+
+  **What to do**: Update the repository guidance so the auth policy is consistent before deeper implementation continues. Sync `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, and any generated contribution/env guidance so production participation is Kakao/Naver OAuth only, guest access is development/test only, Google OAuth is absent, and admin bootstrap uses env-only provider-qualified Kakao/Naver identity identifiers or super-admin approval. Deduplicate repeated policy text and keep English/Korean public claims aligned.
+  **Must NOT do**: Do not remove Google News RSS/feed ingestion references; do not commit secrets or actual admin identifiers; do not publish private local values from `AGENTS.local.md` or `.env`; do not leave docs implying public guest participation at launch.
+
+  **Parallelization**: Can Parallel: NO | Wave 2 Repair | Blocks: 3-16 | Blocked By: 2A
+
+  **References**:
+  - Pattern: `PLAN.md` - product source of truth that currently must absorb the revised auth decision.
+  - Pattern: `README.md`, `README.ko.md` - public principles must remain meaning-aligned.
+  - Pattern: `AGENTS.md` - execution rules must record the production auth policy and Google News RSS exception.
+  - External: Supabase docs - Kakao is a built-in OAuth provider; plan Naver as custom OAuth/OIDC unless later official support is verified from primary docs.
+
+  **Acceptance Criteria**:
+  - [ ] `PLAN.md` states production login/participation is Kakao/Naver OAuth only.
+  - [ ] `PLAN.md` and `AGENTS.md` state development/test guest bypass is allowed only under explicit non-production configuration and is disabled in launch mode.
+  - [ ] `README.md` and `README.ko.md` do not present public guest participation or Google OAuth as launch behavior.
+  - [ ] Admin bootstrap docs use provider-qualified Kakao/Naver identity IDs or super-admin approval, not Google email allowlists.
+  - [ ] Google News RSS/feed ingestion remains explicitly preserved and is not conflated with Google OAuth.
+
+  **QA Scenarios**:
+  ```
+  Scenario: Auth docs contain no stale Google/guest launch contract
+    Tool: bash
+    Steps: rg -n "Google OAuth|Continue as guest|guest login|guest posting|SUPER_ADMIN_EMAILS|ADMIN_EMAILS" PLAN.md README.md README.ko.md AGENTS.md CONTRIBUTING.md .env.example
+    Expected: matches are absent or only describe forbidden production behavior, development/test bypass, variable deprecation, or Google News RSS exception
+    Evidence: .omo/evidence/task-2b-auth-doc-scan.txt
+
+  Scenario: English and Korean summaries stay aligned
+    Tool: manual review
+    Steps: compare README.md and README.ko.md auth/safety paragraphs after edits
+    Expected: both describe Kakao/Naver-only production participation and no public guest launch path
+    Evidence: .omo/evidence/task-2b-readme-sync.txt
+  ```
+
+  **Commit**: YES | Message: `docs(auth): sync Kakao Naver launch policy` | Files: `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, optional env/contribution docs
+
 - [ ] 3. Create Supabase Schema, RLS, Types, And Local Client Boundaries
 
-  **What to do**: Add Supabase CLI config, migrations for every table in `PLAN.md`, enums, indexes, counter snapshots, audit logs, settings, RLS policies, storage buckets, seed data, and generated TypeScript database types. Link to the existing Supabase project ID only through local config or instructions that avoid secrets.
+  **What to do**: Add Supabase CLI config, migrations for every table in `PLAN.md`, enums, indexes, counter snapshots, audit logs, settings, RLS policies, storage buckets, seed data, generated TypeScript database types, and explicit policy fixtures for Kakao/Naver users, admins, super admins, anonymous public reads, and development/test guest bypass. Link to the existing Supabase project ID only through local config or instructions that avoid secrets.
   **Must NOT do**: Do not commit DB password, allowlist emails, API keys, or generated secret-bearing files.
 
-  **Parallelization**: Can Parallel: YES | Wave 2 | Blocks: 5-16 | Blocked By: 1
+  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 5-16 | Blocked By: 1, 2B
 
   **References**:
   - Pattern: `PLAN.md:354` - data model.
@@ -225,18 +319,25 @@ Wave 5: Task 16
 
   **Acceptance Criteria**:
   - [ ] Supabase migrations create all planned tables and enum constraints.
-  - [ ] RLS policies cover guests, users, admins, and super admins.
+  - [ ] RLS policies cover Kakao/Naver authenticated users, development/test guest fixtures, admins, super admins, and anonymous public reads.
   - [ ] Generated DB types compile with `pnpm typecheck`.
   - [ ] Seed data includes affected stations and baseline settings without secrets.
-  - [ ] SQL tests or CLI checks prove guests cannot access admin-only rows.
+  - [ ] SQL tests or CLI checks prove production anonymous/guest identities cannot write voices, reports, or admin-only rows.
+  - [ ] SQL tests or CLI checks prove development/test guest fixtures work only when explicit non-production configuration is enabled.
 
   **QA Scenarios**:
   ```
-  Scenario: RLS blocks guest admin access
+  Scenario: RLS blocks production guest writes and admin access
     Tool: bash
-    Steps: run SQL policy test as anonymous/guest role for admin_applications/settings
-    Expected: read/write denied for admin-only rows
+    Steps: run SQL policy test as anonymous/guest role for voices, reports, admin_applications, and settings in launch-mode fixture
+    Expected: write denied for participation paths and read/write denied for admin-only rows
     Evidence: .omo/evidence/task-3-rls-deny.txt
+
+  Scenario: Development guest fixture is non-production only
+    Tool: bash
+    Steps: run SQL/API policy tests with dev/test guest flag enabled and then disabled
+    Expected: fixture can exercise test writes only when non-production flag is enabled; launch-mode flag denies writes
+    Evidence: .omo/evidence/task-3-dev-guest-policy.txt
 
   Scenario: Public visible content query works
     Tool: bash
@@ -252,7 +353,7 @@ Wave 5: Task 16
   **What to do**: Add English UI label constants, bilingual `{ en, ko }` descriptive copy, safety policy constants, allowed SNS domains, Seoul congestion disclaimers, affected station disclaimer, nickname wordlist contract, and shared Zod schemas. Tests must assert exact critical wording.
   **Must NOT do**: Do not introduce full i18n complexity; do not let UI dock labels become Korean; do not claim election fraud as proven.
 
-  **Parallelization**: Can Parallel: YES | Wave 2 | Blocks: 5-10 | Blocked By: 1
+  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 5-9 | Blocked By: 1, 2B
 
   **References**:
   - Pattern: `PLAN.md:326` - English UI labels and bilingual explanations.
@@ -283,47 +384,57 @@ Wave 5: Task 16
 
   **Commit**: YES | Message: `feat(copy): add safety and UI text contracts` | Files: `src/lib/copy/**`, `src/lib/validation/**`, tests
 
-- [ ] 5. Build Auth, Guest Identity, Role Bootstrap, And Nicknames
+- [ ] 5. Build Kakao/Naver Auth, Launch Gate, Role Bootstrap, And Nicknames
 
-  **What to do**: Implement guest entry, immutable nickname generation, OAuth entry points for Google/Kakao, Naver bridge route planning/implementation, Supabase SSR clients, session cookies, role bootstrap from env allowlists, and login-time demotion. Google admin bootstrap must require `email_verified === true`; Kakao/Naver must never grant admin via email.
-  **Must NOT do**: Do not copy allowlist values into source/tests; use test env fixture values only.
+  **What to do**: Implement production auth around Kakao and Naver only. Use Supabase SSR clients, session cookies, built-in Kakao OAuth, and a Naver custom OAuth/OIDC bridge unless later official Supabase Naver support is verified from primary docs. Add a launch-mode gate that denies guest participation in production, plus a development/test guest bypass behind an explicit non-production env flag for multi-account QA. Generate immutable nicknames for linked users and dev/test guest fixtures. Bootstrap roles from env-only provider-qualified Kakao/Naver identity IDs or explicit super-admin approval, and demote users on login when those identifiers are removed.
+  **Must NOT do**: Do not implement Google OAuth; do not render Google as a login choice; do not use email-only allowlists for admin/super-admin; do not copy allowlist values into source/tests; do not allow production guest login, posting, or reporting.
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 10, 16 | Blocked By: 2, 3, 4
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 10, 16 | Blocked By: 2B, 3, 4
 
   **References**:
-  - Pattern: `AGENTS.local.md` - role bootstrap rules.
+  - Pattern: `PLAN.md`, `AGENTS.md` after Task 2B - Kakao/Naver-only production auth and development/test guest bypass policy.
   - Pattern: `PLAN.md:162` and `PLAN.md:307` - roles/auth/nickname rules.
-  - Skill: `$omo:frontend-ui-ux` - use for auth entry UI, guest/login choice hierarchy, and profile/status affordances.
+  - Skill: `$omo:frontend-ui-ux` - use for auth entry UI, Kakao/Naver choice hierarchy, launch-gate states, and profile/status affordances.
+  - External: Supabase docs - Kakao built-in OAuth provider; Naver planned as custom OAuth/OIDC if no official provider support is verified.
 
   **Acceptance Criteria**:
-  - [ ] Guest can enter `/app` without signup and receives immutable nickname format Korean 6 syllables + 4 digits.
-  - [ ] OAuth user can apply for admin.
-  - [ ] Verified Google allowlist user becomes admin/super; unverified Google and Kakao/Naver do not.
-  - [ ] Removing allowlist fixture demotes on next login.
+  - [ ] In production/launch mode, `/` Enter leads to Kakao and Naver login choices only.
+  - [ ] Google OAuth option is absent from rendered UI, provider policy tests, and app auth configuration.
+  - [ ] Kakao/Naver linked user can enter `/app` and receives immutable nickname format Korean 6 syllables + 4 digits.
+  - [ ] Development/test guest bypass works only when explicit non-production flag is enabled and is rejected in production/launch mode.
+  - [ ] Kakao/Naver OAuth user can apply for admin.
+  - [ ] Provider-qualified Kakao/Naver identity allowlist promotes admin/super-admin and demotes on next login when removed.
+  - [ ] Email-only matches never promote admin/super-admin.
 
   **QA Scenarios**:
   ```
-  Scenario: Guest enters app and gets nickname
+  Scenario: Production auth shows Kakao and Naver only
     Tool: Codex Browser/browser-use
-    Steps: open http://127.0.0.1:3000/; click Enter; choose Continue as guest; inspect profile label
-    Expected: /app loads and nickname matches curated Korean words plus 4 digits
-    Evidence: .omo/evidence/task-5-guest-entry.png
+    Steps: run dev server with launch-mode auth flag; open http://127.0.0.1:3000/; click Enter; inspect auth choices
+    Expected: Kakao and Naver choices are visible; Google and Continue as guest are absent
+    Evidence: .omo/evidence/task-5-auth-choices.png
 
-  Scenario: Non-Google email cannot bootstrap admin
+  Scenario: Development guest bypass is blocked in launch mode
     Tool: bash
-    Steps: pnpm test -- role-bootstrap-provider-restrictions
-    Expected: Kakao/Naver fixture remains user even if email matches fixture allowlist
+    Steps: pnpm test -- auth-launch-guest-policy
+    Expected: dev/test guest fixture succeeds only with non-production flag and fails with launch-mode flag
+    Evidence: .omo/evidence/task-5-guest-launch-policy.txt
+
+  Scenario: Provider-qualified role bootstrap works
+    Tool: bash
+    Steps: pnpm test -- role-bootstrap-provider-ids
+    Expected: Kakao/Naver provider ID fixtures promote/demote; email-only fixture never promotes
     Evidence: .omo/evidence/task-5-role-bootstrap.txt
   ```
 
-  **Commit**: YES | Message: `feat(auth): add guest and role bootstrap flows` | Files: `src/app/**`, `src/lib/auth/**`, `src/lib/nickname/**`, tests
+  **Commit**: YES | Message: `feat(auth): add Kakao Naver launch gate` | Files: `src/app/**`, `src/lib/auth/**`, `src/lib/nickname/**`, tests
 
 - [ ] 6. Build Five-Tab App Shell, Home Dashboard, And Counters
 
   **What to do**: Implement `/app` shell with bottom dock, responsive layout, top profile toggle, Home dashboard, pinned participant/voice counters, highlight cards, cached polling, and regional congestion placeholder contract.
   **Must NOT do**: Do not use realtime per-client sockets for public counters; do not label congestion as rally headcount.
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 10, 13, 16 | Blocked By: 2, 3, 4
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 10, 13, 16 | Blocked By: 2B, 3, 4
 
   **References**:
   - Pattern: `PLAN.md:183` - five-tab information architecture.
@@ -359,7 +470,7 @@ Wave 5: Task 16
   **What to do**: Implement Speak up composer, voices feed, comments, likes/dislikes, share actions, report entrypoint, latest sorting, 7d/1d/12h/1h hot sorting, view/share counters, and Instagram/Threads-style card layout.
   **Must NOT do**: Do not store nickname strings on voice/comment rows; render through `user_id` joins.
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 13, 14, 16 | Blocked By: 2, 3, 4
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 13, 14, 16 | Blocked By: 2B, 3, 4
 
   **References**:
   - Pattern: `PLAN.md:216` - Square behavior and hot score.
@@ -367,7 +478,8 @@ Wave 5: Task 16
   - Skill: `$omo:frontend-ui-ux` - mandatory for Instagram/Threads-style card rhythm, composer affordance, reaction icons, hover/focus states, and motion.
 
   **Acceptance Criteria**:
-  - [ ] Guest and user can create visible voice within rate limits.
+  - [ ] Kakao/Naver authenticated user can create visible voice within rate limits.
+  - [ ] Production anonymous/guest identities cannot create voices.
   - [ ] Comments and reactions update counts.
   - [ ] Hot sorting formula uses share/comment/net reaction/view weights.
   - [ ] Period filters first constrain time window, then sort hot.
@@ -375,11 +487,17 @@ Wave 5: Task 16
 
   **QA Scenarios**:
   ```
-  Scenario: Guest posts a voice
+  Scenario: Kakao/Naver user posts a voice
     Tool: Codex Browser/browser-use
-    Steps: enter as guest; click Square; fill Speak up with 'Your voice, on the record.'; submit
+    Steps: enter with Kakao/Naver auth fixture; click Square; fill Speak up with 'Your voice, on the record.'; submit
     Expected: new voice appears with nickname, counts update
     Evidence: .omo/evidence/task-7-square-post.png
+
+  Scenario: Production guest write is rejected
+    Tool: curl
+    Steps: send POST /api/voices without a Kakao/Naver authenticated session in launch-mode fixture
+    Expected: HTTP 401 or 403 with safe error body and no row inserted
+    Evidence: .omo/evidence/task-7-guest-denied.txt
 
   Scenario: Hot sorting honors time window
     Tool: bash
@@ -395,7 +513,7 @@ Wave 5: Task 16
   **What to do**: Implement rallies list/map, status, support guide, admin-managed rally data, Seoul place-code mapping, server proxy with 1-5 minute cache for Seoul real-time city data, and Seoul-only congestion disclaimer. Use admin/crowdsourced fallback for non-Seoul.
   **Must NOT do**: Do not expose Seoul API key client-side; do not display congestion as rally attendance.
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 12, 16 | Blocked By: 2, 3, 4
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 12, 16 | Blocked By: 2B, 3, 4
 
   **References**:
   - Pattern: `PLAN.md:206` - Rallies requirements.
@@ -430,7 +548,7 @@ Wave 5: Task 16
   **What to do**: Implement Live YouTube grid/replays, News tabs All/Verified/Public/World press, verified badges, Report a post modal, SNS URL validation, admin tip queue integration, RSS/Google News ingestion Cron, keyword filtering, URL dedupe, thumbnail metadata parsing, and GitHub Action for existing feed checker.
   **Must NOT do**: Do not collect article bodies; do not add npm dependencies to `scripts/check-feeds.mjs`.
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: 12, 16 | Blocked By: 2, 3, 4
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 12, 16 | Blocked By: 2B, 3, 4
 
   **References**:
   - Pattern: `PLAN.md:239` - Live.
@@ -468,7 +586,7 @@ Wave 5: Task 16
   **What to do**: Extract station seed data from the prototype into typed data or DB seed, port the ballot-box SVG visual into reusable components, implement `/app/stations`, 가나다 sorting, severity filters, responsive 3/4/6-column grid, summary stats, updated date, Home/Rallies entry links, and daily agentic Cron update structure.
   **Must NOT do**: Do not leave data hard to migrate; do not omit disclaimer; do not state the list proves fraud.
 
-  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 13, 14, 16 | Blocked By: 2, 5, 6
+  **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 13, 14, 16 | Blocked By: 2B, 5, 6
 
   **References**:
   - Pattern: `prototypes/affected-stations/AffectedStations.jsx` - visual/data prototype.
@@ -503,15 +621,15 @@ Wave 5: Task 16
 
 - [ ] 11. Build Admin Queues, Applications, Settings, And Audit Logs
 
-  **What to do**: Implement `/admin` client-only noindex route with role gating, tip approval/rejection, admin application approval/rejection/demotion, moderation queues, super-admin-only auto-hide settings, audit log writes, and profile menu entry points.
+  **What to do**: Implement `/admin` client-only noindex route with role gating, tip approval/rejection, admin application approval/rejection/demotion, moderation queues, super-admin-only auto-hide settings, audit log writes, and profile menu entry points. Admin identity checks must use roles produced by the Kakao/Naver provider-ID bootstrap or explicit super-admin approvals from Task 5.
   **Must NOT do**: Do not expose admin UI to guests/users; do not let regular admins change auto-hide thresholds.
 
-  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 13, 14, 16 | Blocked By: 2, 3
+  **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 13, 14, 16 | Blocked By: 2B, 3, 5
 
   **References**:
   - Pattern: `PLAN.md:297` - admin applications.
   - Pattern: `PLAN.md:258` - moderation queue split.
-  - Pattern: `AGENTS.local.md` - role rules.
+  - Pattern: `PLAN.md`, `AGENTS.md` after Task 2B - provider-qualified Kakao/Naver admin identity policy.
   - Skill: `$omo:frontend-ui-ux` - use for dense utilitarian admin UI, queue scanning, form hierarchy, and destructive-action clarity.
 
   **Acceptance Criteria**:
@@ -539,10 +657,10 @@ Wave 5: Task 16
 
 - [ ] 12. Add Edge Caching, Rate Limits, Turnstile, And Abuse Guardrails
 
-  **What to do**: Implement app-level rate limits for guest writing/reporting, Turnstile challenge on suspicious write paths, cache headers/ISR for public read-heavy endpoints, Cloudflare deployment checklist, WAF/bot rules checklist, and no-Redis baseline documentation.
+  **What to do**: Implement app-level rate limits for authenticated Kakao/Naver writing/reporting, immediate launch-mode rejection for anonymous/guest production writes, optional development/test guest limits behind the same non-production flag as Task 5, Turnstile challenge on suspicious write paths, cache headers/ISR for public read-heavy endpoints, Cloudflare deployment checklist, WAF/bot rules checklist, and no-Redis baseline documentation.
   **Must NOT do**: Do not add Redis; do not leak IP/device identifiers into public UI.
 
-  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 16 | Blocked By: 2, 8, 9
+  **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 16 | Blocked By: 2B, 5, 8, 9
 
   **References**:
   - Pattern: `PLAN.md:123` - read-cache strategy.
@@ -551,15 +669,23 @@ Wave 5: Task 16
 
   **Acceptance Criteria**:
   - [ ] Public read endpoints use cache headers or ISR as appropriate.
-  - [ ] Guest write/report endpoints enforce rate limits.
+  - [ ] Production anonymous/guest write/report endpoints are rejected before rate-limit accounting.
+  - [ ] Authenticated Kakao/Naver write/report endpoints enforce rate limits.
+  - [ ] Development/test guest write/report limits work only when non-production guest bypass is enabled.
   - [ ] Suspicious write flow requires Turnstile.
   - [ ] Cloudflare setup checklist covers DNS/proxy/WAF/DDoS/bot/rate-limit settings.
 
   **QA Scenarios**:
   ```
-  Scenario: Guest write rate limit triggers
+  Scenario: Production guest write is rejected before rate limit
     Tool: curl
-    Steps: send repeated POST /api/voices fixture requests beyond configured threshold
+    Steps: send POST /api/voices without Kakao/Naver session in launch-mode fixture
+    Expected: HTTP 401 or 403 with safe body and no rate-limit bucket increment
+    Evidence: .omo/evidence/task-12-guest-reject.txt
+
+  Scenario: Authenticated write rate limit triggers
+    Tool: curl
+    Steps: send repeated Kakao/Naver-authenticated POST /api/voices fixture requests beyond configured threshold
     Expected: final response HTTP 429 with safe error body
     Evidence: .omo/evidence/task-12-rate-limit.txt
 
@@ -577,7 +703,7 @@ Wave 5: Task 16
   **What to do**: Implement hot-entry one-time AI moderation with `ai_checked`, soft-hide, popular review queue, report/dislike queue, trust scoring, appeal path, OpenAI key usage from env, station/rally/news/tip triage draft agents, anomaly detection hooks, and kill-switch/threshold settings through PostHog or DB settings as planned.
   **Must NOT do**: Do not run AI on every post by default; do not make AI final authority for ambiguous cases; do not print OpenAI key.
 
-  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 16 | Blocked By: 6, 7, 10, 11
+  **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 16 | Blocked By: 6, 7, 10, 11
 
   **References**:
   - Pattern: `PLAN.md:109` - AI-native operations.
@@ -613,7 +739,7 @@ Wave 5: Task 16
   **What to do**: Create PostHog project externally during execution, add SDK, analytics events, feature flags for hot-score weights/moderation thresholds/kill switches, error tracking, session replay with input/body masking, survey hooks if needed, uptime monitor checklist, and spend cap checklist for Vercel/Supabase.
   **Must NOT do**: Do not add Sentry; do not replay sensitive body text or PII.
 
-  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 16 | Blocked By: 7, 10, 11
+  **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 16 | Blocked By: 7, 10, 11
 
   **References**:
   - Pattern: `PLAN.md:94` - PostHog baseline.
@@ -649,7 +775,7 @@ Wave 5: Task 16
   **What to do**: Add Vercel project setup instructions/config, Cloudflare zone/DNS/WAF checklist, Supabase linked project instructions, env var templates without values, GitHub Actions for lint/typecheck/test/build/feed check, Codex Browser/browser-use manual QA instructions, deployment protection/noindex checks, spend caps, and AGPL/license metadata in package/footer.
   **Must NOT do**: Do not create or commit `.env`; do not commit Vercel/Supabase tokens.
 
-  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 16 | Blocked By: 2
+  **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 16 | Blocked By: 2B
 
   **References**:
   - Pattern: `AGENTS.local.md` - external project creation status.
@@ -657,7 +783,7 @@ Wave 5: Task 16
   - Pattern: `CONTRIBUTING.md` - security and checks.
 
   **Acceptance Criteria**:
-  - [ ] `.env.example` lists variable names only.
+  - [ ] `.env.example` lists variable names only, including `SUPER_ADMIN_PROVIDER_IDS` and `ADMIN_PROVIDER_IDS` or the final names chosen in Task 2B.
   - [ ] CI runs lint, typecheck, unit tests, build, and feed check; browser QA remains Codex Browser/browser-use runbook evidence.
   - [ ] Package metadata/license is `AGPL-3.0-only`.
   - [ ] Deployment docs include Vercel, Cloudflare, Supabase, PostHog, Turnstile, uptime, and spend caps.
@@ -666,8 +792,8 @@ Wave 5: Task 16
   ```
   Scenario: Secret scan finds no tracked secrets
     Tool: bash
-    Steps: git grep -nE '(password|api[_-]?key|SUPER_ADMIN_EMAILS|ADMIN_EMAILS)' -- ':!AGENTS.local.md' ':!.omo/**'
-    Expected: no secret values; only safe variable names where appropriate
+    Steps: git grep -nE '(password|api[_-]?key|SUPER_ADMIN_EMAILS|ADMIN_EMAILS|SUPER_ADMIN_PROVIDER_IDS|ADMIN_PROVIDER_IDS)' -- ':!AGENTS.local.md' ':!.omo/**'
+    Expected: no secret values; legacy email allowlist names appear only in deprecation/forbidden-policy context and provider-ID names appear only as safe variable names
     Evidence: .omo/evidence/task-15-secret-scan.txt
 
   Scenario: CI command set runs locally
@@ -684,7 +810,7 @@ Wave 5: Task 16
   **What to do**: Run full test/build suite, Codex Browser/browser-use QA across mobile/desktop viewports, accessibility checks, nonblank screenshot checks, route/SEO checks, RLS regression checks, feed liveness, manual QA transcript, git diff review, and final commit-message review. Fix all failures with TDD before declaring complete.
   **Must NOT do**: Do not mark done from tests alone; do not leave QA processes, browser contexts, or ports running.
 
-  **Parallelization**: Can Parallel: NO | Wave 5 | Blocks: final | Blocked By: all prior tasks
+  **Parallelization**: Can Parallel: NO | Wave 6 | Blocks: final | Blocked By: all prior tasks
 
   **References**:
   - Pattern: all prior task evidence.
@@ -694,6 +820,9 @@ Wave 5: Task 16
   **Acceptance Criteria**:
   - [ ] All automated checks exit 0.
   - [ ] Codex Browser/browser-use QA covers `/`, `/app`, `/app/rallies`, `/app/square`, `/app/live`, `/app/news`, `/app/stations`, `/admin`, `/robots.txt`, `/sitemap.xml`.
+  - [ ] Launch-mode browser QA proves Kakao/Naver are the only production login choices.
+  - [ ] Launch-mode API QA proves anonymous/guest posting/reporting is rejected.
+  - [ ] Static/diff scan proves Google OAuth is absent while Google News RSS/feed ingestion remains intact.
   - [ ] Mobile and desktop screenshots show no overlapping text or broken layout.
   - [ ] Accessibility checks pass for core routes.
   - [ ] Secret scan is clean.
@@ -706,6 +835,12 @@ Wave 5: Task 16
     Steps: drive the local dev server through the listed routes in the Codex in-app Browser and capture route screenshots/action log
     Expected: all route assertions pass; screenshots nonblank and layout-safe
     Evidence: .omo/evidence/task-16-full-browser-report.html
+
+  Scenario: Launch auth policy regression
+    Tool: Codex Browser/browser-use + curl
+    Steps: inspect auth choices from `/` Enter, then POST unauthenticated fixture writes to voices/reports
+    Expected: Kakao/Naver only in UI, no Google/guest launch choices, and unauthenticated writes rejected
+    Evidence: .omo/evidence/task-16-launch-auth-policy.txt
 
   Scenario: Final cleanup receipt
     Tool: PowerShell + Git Bash
@@ -728,7 +863,7 @@ Wave 5: Task 16
 - Use one logical change per commit.
 - Subject format: `<type>(<scope>): <imperative>`.
 - Allowed primary types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `build`, `ci`, `perf`.
-- Subject should be concise and imperative, for example `feat(auth): add guest role bootstrap`.
+- Subject should be concise and imperative, for example `feat(auth): add Kakao Naver launch gate`.
 - Non-trivial commits require a body. Do not use one-line-only commit messages for implementation commits.
 - Body style:
   - Use `- ` bullets, one bullet per line.
@@ -739,11 +874,11 @@ Wave 5: Task 16
 - Example:
 
 ```text
-feat(auth): add guest role bootstrap
+feat(auth): add Kakao Naver launch gate
 
-- Add guest entry with immutable generated nicknames and persisted session state.
-- Promote only verified Google allowlist identities and demote removed identities on next login.
-- Cover provider restrictions, nickname collisions, and guest entry with RED-to-GREEN tests.
+- Add Kakao and Naver production auth entry points with immutable generated nicknames.
+- Block production guest participation while retaining an explicit development/test bypass.
+- Bootstrap admin roles from provider-qualified Kakao/Naver identities and prove Google OAuth stays absent.
 
 Plan: .omo/plans/clearkorea-scaffold-build.md
 ```
@@ -752,7 +887,8 @@ Plan: .omo/plans/clearkorea-scaffold-build.md
 - All root Markdown guidance has been honored.
 - Full v1 scope in `PLAN.md` is represented in implementation tasks.
 - Every task has references, acceptance criteria, QA scenarios, and commit guidance.
-- Scaffolding starts from the current baseline and preserves existing assets/config/prototypes/scripts.
+- Scaffolding starts from the current baseline and preserves existing public/config/prototypes/scripts.
 - Conventional Commit policy is explicit and rejects one-line-only non-trivial implementation commits.
 - Verification requires automated RED->GREEN proof and real Windows-compatible browser/HTTP/PowerShell surface evidence.
+- Production auth policy is internally consistent: Kakao/Naver only, no Google OAuth, no public guest participation, and Google News RSS preserved.
 - Secrets remain local-only and are never copied into source, docs, commits, or evidence.
