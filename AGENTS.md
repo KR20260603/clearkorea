@@ -38,9 +38,9 @@ clearkorea/
 
 ## IMPLEMENTATION BASELINE
 
-- There is no `package.json`, framework config, local dev server, or test runner in this workspace.
-- `PLAN.md` describes the v1 production app; do not assume framework dependencies exist until they are scaffolded.
-- `src/` is reserved for the future Next.js app scaffold. Keep pre-scaffold prototypes, scripts, and config outside `src/`.
+- The Next.js scaffold now exists with `package.json`, `pnpm-lock.yaml`, `src/app`, TypeScript, Tailwind, ESLint, Vitest, and commitlint.
+- `PLAN.md` remains the v1 production source of truth; use `.omo/plans/clearkorea-scaffold-build.md` for the active plan-driven build sequence.
+- Keep pre-scaffold prototypes, scripts, and config outside `src/` unless a plan task explicitly ports them.
 - If `AGENTS.local.md` exists, read it for local-only service/project context. It is ignored by git and must not be committed.
 - `prototypes/affected-stations/AffectedStations.jsx` is written as a component to port into the app. Keep `STATIONS`, `SUMMARY`, and `UPDATED_AT` easy to extract into data files or a DB table.
 - `scripts/check-feeds.mjs` has no external dependencies and relies on Node 18+ global `fetch`.
@@ -67,6 +67,11 @@ clearkorea/
 - For frontend UI, SVG image, raster image, visual design, layout, motion, or graphic polish work, explicitly use `$omo:frontend-ui-ux` and record the aesthetic direction before implementation.
 - Keep aesthetic direction compatible with the project brand: dark civic-tech, SVG-first, high contrast, restrained Korean-flag red/blue accents, and safety-conscious civic copy.
 - Do not let planning artifacts execute the work. Plans may live under `.omo/plans/`; drafts may live under `.omo/drafts/` and should be removed when the final plan is complete.
+- For plan-driven execution, finish one top-level plan task at a time: implement, verify, mark the task checkbox, then commit that task before starting the next top-level task.
+- Do not combine multiple plan tasks into one commit. If a later task was started before the previous commit, split the work back into task-sized commits before continuing.
+- Once the user has approved committing during a plan execution session, treat each task's `Commit: YES` guidance as approval to commit that completed task immediately.
+- Keep bulky runtime evidence local. Do not commit `.omo/evidence/`, `.omo/start-work/`, `.omo/boulder.json`, screenshots, server logs, or transient QA transcripts unless the user explicitly requests those artifacts in git.
+- Commit only durable project changes: source, tests, config, docs, migrations, plan checkbox updates, and concise policy/runbook updates.
 
 ## COMMIT STYLE
 
@@ -75,6 +80,7 @@ clearkorea/
 - Prefer concise multi-line bodies with `- ` bullets, one clear point per line, focused on behavior, verification, safety, or operational impact.
 - For plan-driven implementation commits, include a footer such as `Plan: .omo/plans/<slug>.md`.
 - Do not auto-commit unless the user explicitly approves committing in that session.
+- For plan-driven work after approval, commit at every completed top-level task boundary using that task's planned commit subject/scope when provided.
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
@@ -88,11 +94,20 @@ clearkorea/
 ## COMMANDS
 
 ```bash
+# Install dependencies.
+pnpm install --frozen-lockfile
+
+# Run scaffold/app checks.
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+
 # Check RSS/Google News feed liveness; required checked:true feeds fail the run.
 node scripts/check-feeds.mjs config/feeds.json
 ```
 
-No build, lint, test, or dev-server command exists before the app scaffold is added.
+Use Windows-compatible dev-server process control from `AGENTS.local.md` for browser-facing QA on this machine.
 
 ## NOTES
 
