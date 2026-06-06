@@ -357,7 +357,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(db): add Supabase schema and policies` | Files: `supabase/**`, `src/lib/supabase/**`, generated types
 
-- [ ] 4. Implement Copy System, Safety Constants, And Shared UI Contracts
+- [x] 4. Implement Copy System, Safety Constants, And Shared UI Contracts
 
   **What to do**: Add English UI label constants, bilingual `{ en, ko }` descriptive copy, safety policy constants, allowed SNS domains, Seoul congestion disclaimers, affected station disclaimer, nickname wordlist contract, and shared Zod schemas. Tests must assert exact critical wording.
   **Must NOT do**: Do not introduce full i18n complexity; do not let UI dock labels become Korean; do not claim election fraud as proven.
@@ -371,10 +371,10 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - use when copy contracts affect visible UI labels, hierarchy, empty states, or component microcopy.
 
   **Acceptance Criteria**:
-  - [ ] `copy.ts` or equivalent contains English UI labels and bilingual explanatory copy.
-  - [ ] Tests assert dock labels exactly `Home`, `Rallies`, `Square`, `Live`, `News`.
-  - [ ] Tests assert no critical copy says organized election fraud is established fact.
-  - [ ] URL validation schema allows only approved SNS domains.
+  - [x] `copy.ts` or equivalent contains English UI labels and bilingual explanatory copy.
+  - [x] Tests assert dock labels exactly `Home`, `Rallies`, `Square`, `Live`, `News`.
+  - [x] Tests assert no critical copy says organized election fraud is established fact.
+  - [x] URL validation schema allows only approved SNS domains.
 
   **QA Scenarios**:
   ```

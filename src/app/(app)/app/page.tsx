@@ -7,14 +7,15 @@ import {
   ShieldCheck,
   UsersRound,
 } from "lucide-react";
+import { dockLabels } from "../../../lib/copy/copy";
 import { ShellFrame } from "../../shell-frame";
 
 const dockItems = [
-  { label: "Home", icon: Home },
-  { label: "Rallies", icon: Megaphone },
-  { label: "Square", icon: UsersRound },
-  { label: "Live", icon: RadioTower },
-  { label: "News", icon: Newspaper },
+  { label: dockLabels[0], icon: Home },
+  { label: dockLabels[1], icon: Megaphone },
+  { label: dockLabels[2], icon: UsersRound },
+  { label: dockLabels[3], icon: RadioTower },
+  { label: dockLabels[4], icon: Newspaper },
 ] as const;
 
 export default function AppHomePage() {
