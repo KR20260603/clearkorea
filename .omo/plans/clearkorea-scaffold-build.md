@@ -122,7 +122,7 @@ Wave 5: Task 16
 > Implementation + Test = ONE task. Never separate.
 > EVERY task has references, acceptance criteria, QA scenarios, and commit guidance.
 
-- [ ] 1. Scaffold Next.js Workspace, Tooling, And Commit Policy
+- [x] 1. Scaffold Next.js Workspace, Tooling, And Commit Policy
 
   **What to do**: Initialize the app scaffold in-place using pnpm and the Next.js 16.2 patch line with App Router, TypeScript, Tailwind, ESLint, `src/`, and import alias. Add Vitest, Testing Library, lint/typecheck/build scripts, `commitlint` or an equivalent commit-msg check, and a `CONVENTIONAL_COMMITS.md` or contribution section describing readable multi-line Conventional Commit messages. Preserve existing docs/assets/config/prototypes/scripts. Do not move prototype files into `src/` yet.
   **Must NOT do**: Do not print `.env`; do not delete root docs or prototype files; do not add `pwa-icon.ico`; do not commit automatically.

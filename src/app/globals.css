@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --ck-bg: #0a0a0a;
+  --ck-fg: #ffffff;
+  --ck-red: #cd2e3a;
+  --ck-blue: #0047a0;
+  --ck-muted: #a1a1aa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--ck-bg);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(205, 46, 58, 0.18), transparent 24rem),
+    radial-gradient(circle at 82% 24%, rgba(0, 71, 160, 0.2), transparent 26rem),
+    var(--ck-bg);
+  color: var(--ck-fg);
+  font-family:
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
