@@ -6,6 +6,7 @@ const requiredPublicAssets = [
   "pwa-icon.svg",
   "pwa-icon.png",
   "hero.png",
+  "hero2.png",
   "hero-mobile.png",
   "og.png",
   "splash.png",
