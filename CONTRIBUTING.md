@@ -23,9 +23,10 @@ ClearKorea is licensed under `AGPL-3.0-only`. By contributing, you agree that yo
 
 ## Security Rules
 
-- Never commit secrets, env values, admin allowlist emails, API keys, database passwords, or deployment tokens.
+- Never commit secrets, env values, admin bootstrap identifiers, API keys, database passwords, or deployment tokens.
 - Keep `.env*` files local.
 - If you suspect a secret was committed, rotate it before opening an issue or PR.
+- Do not integrate Supabase, Vercel, Cloudflare, or PostHog blindly. Hosted project creation, DNS/WAF changes, billing, OAuth secrets, analytics projects, and production credentials require user approval. Non-critical integration work should use an abstraction and end with a setup guide.
 
 ## Pull Requests
 

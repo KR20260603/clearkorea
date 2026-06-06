@@ -21,8 +21,8 @@ It is not a partisan site. It is built as a public square for the broadly shared
 ## Getting Started
 
 - Enter from the **Enter** button on the landing page.
-- **Guest**: join instantly with no signup (post a voice, comment, report). A nickname is assigned automatically.
-- **Sign in**: log in with Google, Kakao, or Naver to unlock extras such as applying to become an admin.
+- Production participation requires Kakao or Naver account linking. This keeps the public square accountable while still keeping voices transparent and lawful.
+- Development/test bypasses may exist only for non-production QA and are disabled in launch mode.
 - The interface is a single responsive layout built mobile-first; on desktop the same screen simply spreads wider.
 
 ## Layout (Five Bottom Tabs)
@@ -42,7 +42,7 @@ Everything about the on-the-ground rallies and how to support them.
 The online protest square and the central entry point of the platform.
 - Post your voice through the **Speak up** field, and respond with comments and likes.
 - The participant and voice counters stay pinned at the top.
-- Guests can post immediately; a nickname is assigned automatically.
+- Linked Kakao/Naver participants receive an immutable generated nickname automatically.
 
 ### 4. Live
 A single place to watch rallies as they happen.
@@ -70,7 +70,8 @@ Verified statements, citizen posts, and foreign coverage, split into four tabs.
 - Encouraging or organizing unlawful acts (physically blocking vote counting, private retaliation, and the like) is prohibited.
 - Only lawful expression, sharing rally information, and solidarity through verified posts are supported.
 - ClearKorea is operated as a public, open-source platform. Anyone can contribute through GitHub issues and pull requests: https://github.com/KR20260603/clearkorea
-- Secrets, admin allowlist emails, API keys, database passwords, and deployment tokens must never be committed.
+- Secrets, admin bootstrap identifiers, API keys, database passwords, and deployment tokens must never be committed.
+- Do not integrate Supabase, Vercel, Cloudflare, or PostHog blindly. Critical setup that changes hosted projects, DNS, billing, OAuth secrets, WAF rules, or analytics projects must stop for user approval; non-critical work should abstract the integration and provide a final setup guide.
 
 ## License
 

@@ -54,6 +54,7 @@ test-results/
 .omo/dev/
 .omo/evidence/
 .omo/start-work/
+.omo/ulw-loop/
 
 # Generated temporary files
 tmp/

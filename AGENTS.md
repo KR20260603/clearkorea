@@ -79,6 +79,7 @@ clearkorea/
 - For frontend UI, SVG image, raster image, visual design, layout, motion, or graphic polish work, explicitly use `$omo:frontend-ui-ux` and record the aesthetic direction before implementation.
 - Keep aesthetic direction compatible with the project brand: dark civic-tech, SVG-first, high contrast, restrained Korean-flag red/blue accents, and safety-conscious civic copy.
 - Do not let planning artifacts execute the work. Plans may live under `.omo/plans/`; drafts may live under `.omo/drafts/` and should be removed when the final plan is complete.
+- Do not integrate Supabase, Vercel, Cloudflare, or PostHog blindly. For critical hosted-service changes, stop for user approval; when the integration is not critical to current behavior, abstract the integration and provide a final setup guide instead of wiring live services.
 - For plan-driven execution, finish one top-level plan task at a time: implement, verify, mark the task checkbox, then commit that task before starting the next top-level task.
 - Do not combine multiple plan tasks into one commit. If a later task was started before the previous commit, split the work back into task-sized commits before continuing.
 - Once the user has approved committing during a plan execution session, treat each task's `Commit: YES` guidance as approval to commit that completed task immediately.

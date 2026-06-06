@@ -81,6 +81,7 @@ Build the complete ClearKorea v1 web application from the current prototype base
 - Admin bootstrap uses env-only provider-qualified Kakao/Naver identity identifiers or explicit super-admin approval, not Google verified email.
 - Use `$omo:frontend-ui-ux` explicitly before frontend UI, SVG image, raster image, visual design, layout, motion, or graphic polish work.
 - For design work, require a written aesthetic direction before implementation: purpose, tone, constraints, and the one memorable differentiator.
+- Do not integrate Supabase, Vercel, Cloudflare, or PostHog blindly. Critical hosted-service setup must stop for user approval; non-critical work should stay behind abstractions and end with a final setup guide.
 
 ### Must NOT Have
 - No source or docs containing secret values or allowlist email values.
@@ -118,8 +119,8 @@ Wave 6: Task 16
 - Completed through Task 2A in commit `e0012fc feat(shell): add unified branded app shell`.
 - Task 2A repaired the landing/app visual shell beyond its original narrow GitHub/assets scope: one GitHub affordance, `public/` root assets, `hero2.png` landing background, shared `ShellFrame`, `/app` `tile.png` background, and icon bottom dock.
 - Verified after Task 2A: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, plus Chrome viewport checks for `/` and `/app` at desktop and small mobile sizes down to `320x420`.
-- **Next task to execute: Task 2B.** Sync stale auth policy across `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, and related contribution/env guidance before starting Supabase schema/auth work.
-- Do not start Tasks 3 or 4 until Task 2B is complete and committed.
+- **Next task to execute after this task-boundary commit: Task 3.** Task 2B synced stale auth policy across `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, and contribution guidance.
+- Do not start Tasks 3 or 4 until Task 2B is committed or the user explicitly directs uncommitted continuation.
 
 ### Dependency Matrix
 | Task | Blocks | Blocked By |
@@ -275,7 +276,7 @@ Wave 6: Task 16
 
   **Commit**: DONE | Commit: `e0012fc feat(shell): add unified branded app shell` | Files: `src/app/**`, `public/hero2.png`, tests, package metadata
 
-- [ ] 2B. Sync Auth Policy Across Docs And Plan Contracts
+- [x] 2B. Sync Auth Policy Across Docs And Plan Contracts
 
   **What to do**: Update the repository guidance so the auth policy is consistent before deeper implementation continues. Sync `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, and any generated contribution/env guidance so production participation is Kakao/Naver OAuth only, guest access is development/test only, Google OAuth is absent, and admin bootstrap uses env-only provider-qualified Kakao/Naver identity identifiers or super-admin approval. Deduplicate repeated policy text and keep English/Korean public claims aligned.
   **Must NOT do**: Do not remove Google News RSS/feed ingestion references; do not commit secrets or actual admin identifiers; do not publish private local values from `AGENTS.local.md` or `.env`; do not leave docs implying public guest participation at launch.
@@ -289,11 +290,12 @@ Wave 6: Task 16
   - External: Supabase docs - Kakao is a built-in OAuth provider; plan Naver as custom OAuth/OIDC unless later official support is verified from primary docs.
 
   **Acceptance Criteria**:
-  - [ ] `PLAN.md` states production login/participation is Kakao/Naver OAuth only.
-  - [ ] `PLAN.md` and `AGENTS.md` state development/test guest bypass is allowed only under explicit non-production configuration and is disabled in launch mode.
-  - [ ] `README.md` and `README.ko.md` do not present public guest participation or Google OAuth as launch behavior.
-  - [ ] Admin bootstrap docs use provider-qualified Kakao/Naver identity IDs or super-admin approval, not Google email allowlists.
-  - [ ] Google News RSS/feed ingestion remains explicitly preserved and is not conflated with Google OAuth.
+  - [x] `PLAN.md` states production login/participation is Kakao/Naver OAuth only.
+  - [x] `PLAN.md` and `AGENTS.md` state development/test guest bypass is allowed only under explicit non-production configuration and is disabled in launch mode.
+  - [x] `README.md` and `README.ko.md` do not present public guest participation or Google OAuth as launch behavior.
+  - [x] Admin bootstrap docs use provider-qualified Kakao/Naver identity IDs or super-admin approval, not Google email allowlists.
+  - [x] Google News RSS/feed ingestion remains explicitly preserved and is not conflated with Google OAuth.
+  - [x] Major service integration policy requires user approval for critical hosted changes and abstraction plus final setup guide for non-critical work.
 
   **QA Scenarios**:
   ```

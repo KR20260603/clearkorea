@@ -28,7 +28,7 @@
 - ClearKorea는 오픈소스 플랫폼으로 운영한다. 누구나 GitHub issue/PR로 기획, 문서, 코드, 데이터 품질 개선에 기여할 수 있게 한다.
 - 라이선스는 **AGPL-3.0-only**로 둔다. 웹 서비스로 변형 운영되는 경우에도 수정 소스 공개를 요구해 투명성 컨셉과 맞춘다.
 - 사이트 푸터에는 GitHub 링크를 노출한다. 라벨은 `GitHub` 또는 `Contribute on GitHub`, 대상은 `https://github.com/KR20260603/clearkorea`.
-- 공개 레포에는 소스·기획·비밀이 아닌 운영 원칙만 둔다. 실제 시크릿, 어드민 이메일 화이트리스트, API key, DB password, 배포 토큰은 env/Vercel/Supabase/Cloudflare/PostHog 설정에만 둔다.
+- 공개 레포에는 소스·기획·비밀이 아닌 운영 원칙만 둔다. 실제 시크릿, 어드민 부트스트랩 식별자, API key, DB password, 배포 토큰은 env/Vercel/Supabase/Cloudflare/PostHog 설정에만 둔다.
 
 ---
 
@@ -91,6 +91,13 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
 세션은 단일 도메인 쿠키로 처리한다.
 
+### 3-0. 외부 서비스 연동 원칙
+
+- Do not integrate Supabase, Vercel, Cloudflare, or PostHog blindly.
+- 실제 프로젝트 생성, 결제/요금제 변경, DNS 전환, WAF/봇 차단 적용, OAuth provider secret 등록, PostHog 프로젝트 생성처럼 운영 상태를 바꾸는 critical integration은 작업자가 멈추고 user approval을 받아야 한다.
+- 구현에 critical하지 않은 연동은 먼저 provider interface, environment variable contract, mock/fake adapter, setup checklist로 추상화한다. 마지막 배포 준비 단계에서 final setup guide로 실제 연결을 돕는다.
+- 문서·코드에는 변수명과 절차만 남기고, project ID를 제외한 secret value, token, password, OAuth client secret, 실제 admin identifier는 커밋하지 않는다.
+
 ### 3-1. 개발/운영 보조 도구 (전부 무료 티어로 시작, baseline)
 
 - **shadcn/ui**: Tailwind 컴포넌트, UI 속도 ↑, 락인 없음
@@ -101,7 +108,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
   - 피처플래그로 점진 출시 + 공격/장애 시 kill-switch + 모더레이션 임계값 원격 조정
   - 민감 유저라 세션 리플레이는 입력값·목소리 본문 마스킹(PII 금지), EU 호스팅/셀프호스트 고려
   - Sentry 안 씀: PostHog 에러트래킹으로 대체(트라이얼 만료 없음). 스파이크 시 에러 인입 샘플링/한도 설정(공격 트래픽은 Cloudflare가 앞단에서 흡수)
-- **Cloudflare Turnstile**: 무료 캡차(게스트 도배/봇 차단)
+- **Cloudflare Turnstile**: 무료 캡차(작성·제보 도배/봇 차단)
 - **업타임 모니터**(UptimeRobot/Better Stack 무료): 다운 즉시 알림
 - 선택: **Vercel Web Analytics**(PostHog 웹애널리틱스와 중복), **Resend**(관리자 승인 알림 메일)
 - 범위 밖: Sentry, Auth0, Redis, 무거운 APM(Datadog/New Relic), 별도 GraphQL
@@ -137,9 +144,9 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 특정 세력의 공격이 예상되므로 **Cloudflare를 day-1부터 필수 적용**한다(핵심 기능 무료).
 
 - **무제한 DDoS 완화** (Vercel 요금 폭탄도 방지)
-- **WAF**(인젝션/XSS/악성봇 룰) + **봇 차단**(게스트 글쓰기 스팸 방어)
+- **WAF**(인젝션/XSS/악성봇 룰) + **봇 차단**(쓰기 경로 스팸 방어)
 - **CDN 캐시**(Vercel 대역폭 절감 + 해외 유저 속도), **엣지 레이트리밋**, **R2**(egress 무료 스토리지)
-- 게스트 작성에 레이트리밋(앱 레벨) + 의심 시 Turnstile 캡차
+- 쓰기 경로에 앱 레벨 레이트리밋 + 의심 시 Turnstile 캡차. Development/test guest bypass도 같은 non-production flag 뒤에서만 허용한다.
 - 스팸/도배 모더레이션 + 신고 큐
 
 ### 4-3. 요금제 (기준 시점에 따라 변동)
@@ -163,19 +170,16 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
 | 역할 | 로그인 | 권한 |
 |------|--------|------|
-| 게스트 | 자동 닉네임 | 목소리 작성/댓글, 제보 |
-| 일반 유저 | OAuth(구글/카카오/네이버) | 게스트 권한 + 관리자 신청 |
-| 어드민 | OAuth + 승인 | 제보 승인/반려, 집회·스트림·뉴스 관리, 모더레이션 |
-| 최고 어드민 | OAuth + 지정 | 어드민 신청 승인/해제, 전체 권한 |
+| 개발/테스트 우회 | 명시적 non-production flag | 다중 계정 QA용 임시 참여. launch mode에서는 불가능 |
+| 일반 유저 | 카카오/네이버 OAuth | 목소리 작성/댓글, 제보, 관리자 신청 |
+| 어드민 | 카카오/네이버 OAuth + 승인 | 제보 승인/반려, 집회·스트림·뉴스 관리, 모더레이션 |
+| 최고 어드민 | 카카오/네이버 OAuth + 지정/승인 | 어드민 신청 승인/해제, 전체 권한 |
 
-- **역할 부트스트랩 = 구글 인증 이메일 화이트리스트**: 구글 OAuth 로그인 시 인증된 이메일이 화이트리스트에 있으면 자동으로 해당 역할 부여(DB 수동 작업 불필요).
-  - 최고 어드민: env `SUPER_ADMIN_EMAILS` / 어드민: env `ADMIN_EMAILS` (둘 다 레포·문서에 평문 표기 안 함, 콤마로 복수 가능)
-  - 승격 판정은 구글 OAuth에서 받은 `email_verified === true` 이메일에만 적용한다. 카카오·네이버 이메일로는 어드민/최고 어드민 승격 금지.
-  - 비교는 이메일을 소문자로 정규화하고 env 값을 `split(',')` → `trim()` → lowercase 처리해 수행한다.
-  - 역할은 매 로그인마다 재평가한다. 화이트리스트에서 빠진 계정은 다음 로그인 때 `user`로 자동 강등된다.
-  - 이메일은 접근 권한이 아니라 식별자일 뿐(실제 접근은 해당 구글 계정 로그인 + `email_verified=true` 필요). 화이트리스트에서 빠지면 다음 로그인 시 권한 회수.
-  - 보안 핵심: 이 계정들(특히 최고 어드민)에 **2FA/패스키 필수**.
-- 어드민 신청은 OAuth 유저만, 최고 어드민이 트롤·부적격자를 해제(강등) 가능
+- production participation requires Kakao or Naver OAuth. 공개 출시 환경에서는 Google OAuth, public guest login, guest posting, guest reporting을 노출하지 않는다.
+- Development/test guest bypass is non-production only. 여러 계정 QA 편의를 위해 explicit non-production configuration 뒤에서만 허용하고, launch mode에서는 UI/API/DB policy 모두 거부해야 한다.
+- Admin bootstrap uses provider-qualified Kakao/Naver identity identifiers or explicit super-admin approval. 실제 식별자 값은 env-only이며 문서·소스·커밋에 쓰지 않는다.
+- 역할은 매 로그인마다 재평가한다. env bootstrap identifier에서 빠진 계정은 다음 로그인 때 `user`로 자동 강등된다.
+- 어드민 신청은 카카오/네이버 OAuth 유저만 가능하며, 최고 어드민이 트롤·부적격자를 해제(강등) 가능하다.
 - 모든 승인/해제는 `audit_logs`에 기록
 
 ---
@@ -217,7 +221,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 - 상단 고정 집계 바(참여한 사람 수 / 목소리 수)
 - **Speak up** 입력창 → 목소리 작성(텍스트, 선택적 해시태그)
 - 각 글 액션: 공감 / 비추 / 댓글 / **공유** / 신고. 자정작용으로 숨김된 글은 피드에서 제외(7-7)
-- 게스트도 자동 발급 닉네임으로 즉시 작성
+- 공개 론칭에서는 카카오/네이버 OAuth 사용자만 작성 가능. 개발/테스트 게스트 우회는 명시적 비운영 설정에서만 자동 발급 닉네임으로 작성 가능
 - (옵션) 해시태그 필터, 유저 차단/뮤트
 
 **피드 정렬 (탭)**
@@ -232,7 +236,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 - 넉넉한 여백, 둥근 모서리, 미니멀 구분선, 다크 테마. 탭하면 댓글 펼침
 
 **집계 정의**
-- 참여한 사람 수 = 목소리를 1회 이상 남긴 고유 사용자 수(중복 제거). 게스트는 쿠키/디바이스 기준 근사치, OAuth는 계정 기준 정확.
+- 참여한 사람 수 = 목소리를 1회 이상 남긴 고유 사용자 수(중복 제거). 공개 론칭은 Kakao/Naver OAuth 계정 기준으로 집계하고, development/test guest fixture는 비운영 QA에서만 쿠키/디바이스 기준 근사치로 다룬다.
 - 목소리 수 = 작성된 목소리(게시·댓글) 총합.
 - 둘 다 증분 갱신 + 캐시 스냅샷으로 노출.
 
@@ -290,7 +294,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 - 버튼 → 모달, 입력 2개만: **공인/준공인명**, **URL(SNS 링크)**
 - 제출 시 검증: URL 형식 + **허용 SNS 도메인 화이트리스트**(x.com, instagram.com, youtube.com, youtu.be, facebook.com, tiktok.com, threads.net 등) + (선택) HEAD 도달 확인
 - 제출 후 `pending` → 어드민 승인 큐 → 승인 시 Verified 노출 / 반려
-- 게스트도 제보 가능(승인은 어드민)
+- 공개 론칭에서는 카카오/네이버 OAuth 사용자만 제보 가능(승인은 어드민). Development/test fixture report는 명시적 비운영 설정에서만 허용한다.
 
 ---
 
@@ -306,15 +310,15 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
 ## 11. 로그인 / 인증(Auth)
 
-- 게스트: **Continue as guest** 별도 가입 없이 즉시 입장(쿠키/로컬 저장, 바로 작성)
-- 소셜: 구글 / 카카오 / 네이버 OAuth
-  - 구글·카카오는 Supabase Auth 네이티브(대시보드 키 + `signInWithOAuth`)
-  - 네이버는 Supabase 미지원 → 커스텀 OAuth 라우트로 토큰 받아 Supabase 세션에 연결
-  - 로그인 시 역할 부여: 구글 인증 이메일이 화이트리스트(최고 어드민/어드민)에 있으면 자동 승격(5장), 그 외는 일반 유저
+- 출시 환경: 카카오 / 네이버 OAuth만 허용한다. Google OAuth는 production auth scope에서 제외한다.
+  - 카카오는 Supabase Auth built-in OAuth provider로 계획한다.
+  - 네이버는 현재 계획상 custom OAuth/OIDC provider 또는 bridge로 추상화한다. 실제 구현 직전 공식 Supabase docs를 다시 확인하고, critical provider configuration은 user approval 뒤 진행한다.
+  - Google News RSS is unrelated to Google OAuth. 외신/뉴스 피드 ingestion에서 Google News RSS를 쓰는 것은 로그인 정책과 별개로 유지한다.
+- 개발/테스트: development/test guest bypass는 explicit non-production flag 뒤에서만 허용한다. launch mode에서는 렌더링, API, RLS 모두에서 거부한다.
 - 단일 도메인 쿠키 세션. 우상단: 비로그인 Log in / 로그인 시 닉네임 + Log out
 
 **닉네임 (자동 생성, 변경 불가)**
-- 가입 시(게스트·OAuth 공통) 자동 랜덤 생성: **한국어 6글자 + 숫자 4자리**
+- 가입 시(카카오/네이버 OAuth 및 development/test guest fixture) 자동 랜덤 생성: **한국어 6글자 + 숫자 4자리**
 - 한국어 6글자 = 안전한 일반 명사 2개를 음절 합 6으로 조합(1+5 / 2+4 / 3+3 / 4+2 / 5+1). 비속어·차별·정치·스팸 없는 큐레이션 워드리스트(음절 길이별 버킷)에서만 추출
 - 숫자 4자리로 충돌 회피, `users.nickname` unique + 충돌 시 재생성
 - 예: 무지개민들레4821, 바다해바라기1305
@@ -353,7 +357,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
 ## 15. 데이터 모델 (초안)
 
-- `users` (id, nickname[unique·변경불가], is_guest, oauth_provider, role[guest/user/admin/super], verified_badge, trust_score, created_at)
+- `users` (id, nickname[unique·변경불가], is_guest[dev/test only], oauth_provider[kakao/naver], oauth_subject, role[guest/user/admin/super], verified_badge, trust_score, created_at)
 - `voices` (id, user_id, content, hashtags, visibility[visible/hidden/removed], ai_checked, created_at, like_count, dislike_count, comment_count, view_count, share_count)
 - `comments` (id, voice_id, user_id, content, visibility, created_at)
 - `rallies` (id, title, location, lat, lng, seoul_place_code, start_at, status, updated_by)  *seoul_place_code 있으면 실시간 혼잡도 연동, 혼잡도 값 자체는 캐시*
@@ -379,15 +383,15 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
 전부 v1 범위. 대략 위에서 아래로.
 
-- [ ] `clearkorea.com` 구매 + Cloudflare DNS/프록시 적용(무료, WAF/DDoS/봇 on)
+- [ ] `clearkorea.com` 구매 + Cloudflare DNS/프록시 적용(무료, WAF/DDoS/봇 on). DNS 전환·WAF 적용은 critical integration이므로 user approval 뒤 진행
 - [ ] Next.js 16.2 셋업(pnpm, 라우트 그룹 marketing/app/admin) + Tailwind + shadcn/ui + 디자인 토큰
 - [ ] `/public` 브랜드 에셋 연결: PWA manifest(아이콘 pwa-icon · 스플래시 splash · theme `#0A0A0A`) + favicon/apple-touch + OG(og.png) + README 배너(readme-banner.svg) + 랜딩 히어로(hero / hero-mobile)
 - [ ] 사이트 공통 푸터에 GitHub 링크(`https://github.com/KR20260603/clearkorea`) 추가 + 오픈소스 기여 경로 노출
 - [ ] 라이선스 표기: 푸터/문서/패키지 메타데이터에 `AGPL-3.0-only` 반영
-- [ ] Supabase 프로젝트 + 스키마 + RLS + Supavisor 풀링 + 타입 생성
-- [ ] 역할 부트스트랩: env `SUPER_ADMIN_EMAILS` / `ADMIN_EMAILS`(레포 미커밋) → 로그인 시 자동 승격
+- [ ] Supabase 스키마 + RLS + Supavisor 풀링 + 타입 생성. 실제 hosted project 연결은 critical integration이면 user approval 뒤 진행하고, 그 전에는 local/abstract adapter로 진행
+- [ ] 역할 부트스트랩: env-only provider-qualified Kakao/Naver identity identifiers 또는 explicit super-admin approval → 로그인 시 자동 승격/강등
 - [ ] 닉네임 자동생성(한국어 6글자 + 숫자 4자리, 음절별 워드리스트, 충돌 재생성, 변경불가) + user_id 참조 동기화
-- [ ] 게스트 즉시 입장 + OAuth(구글·카카오 네이티브, 네이버 커스텀 브리지)
+- [ ] 카카오/네이버 OAuth launch gate + development/test guest bypass(non-production only)
 - [ ] Square: 목소리 작성/댓글 + 집계 2종(증분 + 캐시 스냅샷)
 - [ ] 피드 정렬: 최신순 + 7d/1d/12h/1h 핫 점수(가중합: 공유·댓글·추천−비추·조회) + 조회/공유 집계 + 인스타·스레드 스타일 카드
 - [ ] Home 대시보드 / Rallies(+지도) / Live(유튜브 embed)
