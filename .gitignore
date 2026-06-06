@@ -51,6 +51,7 @@ playwright-report/
 test-results/
 .nyc_output/
 .omo/boulder.json
+.omo/dev/
 .omo/evidence/
 .omo/start-work/
 

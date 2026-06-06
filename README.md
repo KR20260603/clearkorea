@@ -2,7 +2,7 @@
 
 # What ClearKorea Is
 
-![ClearKorea](assets/readme-banner.svg)
+![ClearKorea](public/readme-banner.svg)
 
 > **An online square for citizens demanding electoral transparency and a fair re-vote.**
 

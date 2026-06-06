@@ -13,9 +13,22 @@ describe("LandingPage", () => {
       "href",
       "/app",
     );
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
+    const githubLinks = screen.getAllByRole("link", { name: "GitHub" });
+    expect(githubLinks).toHaveLength(1);
+    const [githubLink] = githubLinks;
+    if (!githubLink) {
+      throw new Error("expected one GitHub link");
+    }
+    expect(githubLink).toHaveAttribute(
       "href",
       "https://github.com/KR20260603/clearkorea",
+    );
+    expect(document.querySelector('img[src="/pwa-icon.svg"]')).not.toBeNull();
+    expect(screen.getByTestId("landing-hero-media")).toHaveClass(
+      "bg-[image:url('/hero-mobile.png')]",
+    );
+    expect(screen.getByTestId("landing-hero-media")).toHaveClass(
+      "md:bg-[image:url('/hero.png')]",
     );
     expect(
       document.querySelector('script[type="application/ld+json"]'),

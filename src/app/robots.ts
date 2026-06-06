@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: ["/", "/assets/"],
+      allow: ["/"],
       disallow: ["/app", "/admin"],
     },
     sitemap: "https://clearkorea.com/sitemap.xml",

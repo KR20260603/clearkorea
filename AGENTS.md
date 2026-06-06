@@ -16,7 +16,7 @@ clearkorea/
 ├── README.ko.md       # Korean product summary; keep in sync with README.md
 ├── PLAN.md            # Source of truth for v1 scope, stack, safety, data model
 ├── IMAGE.md           # Prompts and rules for raster brand/marketing assets
-├── assets/            # SVG/PNG/JPG brand, PWA, OG, and SNS assets
+├── public/            # SVG/PNG/JPG brand, PWA, OG, and SNS assets
 ├── config/
 │   └── feeds.json     # Foreign press feed and keyword-filter config
 ├── prototypes/
@@ -32,7 +32,7 @@ clearkorea/
 |------|----------|-------|
 | Product scope and architecture | `PLAN.md` | Planned stack is Next.js 16.2, React 19, TypeScript, Tailwind, Supabase, Vercel, Cloudflare, PostHog, pnpm. |
 | User-facing copy and principles | `README.md`, `README.ko.md` | Keep English/Korean meaning aligned when editing product claims. |
-| Brand assets and generation rules | `IMAGE.md`, `assets/` | SVG-first for app/docs/open-source surfaces; raster only for PWA/OG/SNS/marketing needs. |
+| Brand assets and generation rules | `IMAGE.md`, `public/` | SVG-first for app/docs/open-source surfaces; raster only for PWA/OG/SNS/marketing needs. |
 | Affected polling station UI | `prototypes/affected-stations/AffectedStations.jsx` | Self-contained JSX component with inline CSS and hardcoded station data. |
 | Foreign press feed validation | `config/feeds.json`, `scripts/check-feeds.mjs` | `checked: true` feeds are required and make the checker fail if dead. |
 
@@ -54,7 +54,7 @@ clearkorea/
 - For affected polling stations, keep the disclaimer that the list summarizes confirmed administrative failures and does not itself prove election fraud.
 - UI labels in the planned app bottom dock are English-only: `Home`, `Rallies`, `Square`, `Live`, `News`.
 - Brand palette is dark civic-tech: `#0A0A0A`, white, Korean-flag red `#CD2E3A`, and Korean-flag blue `#0047A0`; use red/blue as accents.
-- Brand direction is SVG-first. Use `assets/readme-banner.svg` and `assets/pwa-icon.svg` as the clean vector style references.
+- Brand direction is SVG-first. Use `public/readme-banner.svg` and `public/pwa-icon.svg` as the clean vector style references.
 - Preserve generated asset names from `PLAN.md` and `IMAGE.md`: `pwa-icon.svg`, `pwa-icon.png`, `pwa-icon.jpg`, `hero.png`, `hero-mobile.png`, `splash.png`, `og.png`, `readme-banner.svg`, `square.png`, `ig-feed.png`, `ig-story.png`, `x-header.png`, `tile.png`.
 
 ## PLANNING AND EXECUTION PHILOSOPHY
@@ -89,7 +89,7 @@ clearkorea/
 - Do not introduce Sentry as the default observability path; the plan uses PostHog error tracking.
 - Do not add Redis or a separate in-memory cache as baseline infrastructure unless measured bottlenecks justify it.
 - Do not convert the feed checker to depend on npm packages without a concrete reason; its current value is dependency-free CI use.
-- Do not add `assets/pwa-icon.ico`; `pwa-icon.svg` is the canonical icon source, with PNG/JPG variants only.
+- Do not add `public/pwa-icon.ico`; `pwa-icon.svg` is the canonical icon source, with PNG/JPG variants only.
 
 ## COMMANDS
 

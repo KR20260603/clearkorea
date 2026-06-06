@@ -23,7 +23,7 @@ export const metadata: Metadata = {
       "An online square for citizens demanding electoral transparency and a fair re-vote.",
     url: "https://clearkorea.com/",
     siteName: "ClearKorea",
-    images: ["/assets/og.png"],
+    images: ["/og.png"],
     locale: "en_US",
     alternateLocale: ["ko_KR"],
     type: "website",
@@ -33,11 +33,11 @@ export const metadata: Metadata = {
     title: "ClearKorea",
     description:
       "Your voice, on the record. A civic platform for Korean election transparency.",
-    images: ["/assets/og.png"],
+    images: ["/og.png"],
   },
   icons: {
-    icon: "/assets/pwa-icon.svg",
-    apple: "/assets/pwa-icon.png",
+    icon: "/pwa-icon.svg",
+    apple: "/pwa-icon.png",
   },
   manifest: "/manifest.webmanifest",
 };

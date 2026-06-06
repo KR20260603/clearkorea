@@ -2,7 +2,7 @@
 
 # 클리어코리아란
 
-![ClearKorea](assets/readme-banner.svg)
+![ClearKorea](public/readme-banner.svg)
 
 > **투명한 선거와 재투표를 요구하는 시민들의 온라인 광장.**
 

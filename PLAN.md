@@ -49,7 +49,7 @@
 
 검정 배경 + 하양 위주, 빨강/파랑은 액션·링크·뱃지 포인트로만 절제해서 쓴다.
 
-### 2-1. 에셋 / 브랜드 이미지 (`/assets`)
+### 2-1. 에셋 / 브랜드 이미지 (`/public`)
 
 image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
@@ -345,7 +345,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 ## 14. SEO (랜딩 전용)
 
 - 검색 노출은 랜딩(`/` 공개 라우트)만. 앱/어드민은 `noindex`
-- Metadata API(title/description/OG, 기본 OG 이미지 `/assets/og.png`) + 동적 `sitemap.ts`/`robots.ts`(공개 라우트만) + `opengraph-image`
+- Metadata API(title/description/OG, 기본 OG 이미지 `/og.png`) + 동적 `sitemap.ts`/`robots.ts`(공개 라우트만) + `opengraph-image`
 - JSON-LD: Organization. `hreflang` en/ko(영어 우선 + 한국어 대체)
 - 키워드: 재선거, 선거 투명성, 6·3 지방선거 진상규명 / South Korea election, recount 등
 
@@ -381,7 +381,7 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 
 - [ ] `clearkorea.com` 구매 + Cloudflare DNS/프록시 적용(무료, WAF/DDoS/봇 on)
 - [ ] Next.js 16.2 셋업(pnpm, 라우트 그룹 marketing/app/admin) + Tailwind + shadcn/ui + 디자인 토큰
-- [ ] `/assets` 브랜드 에셋 연결: PWA manifest(아이콘 pwa-icon · 스플래시 splash · theme `#0A0A0A`) + favicon/apple-touch + OG(og.png) + README 배너(readme-banner.svg) + 랜딩 히어로(hero / hero-mobile)
+- [ ] `/public` 브랜드 에셋 연결: PWA manifest(아이콘 pwa-icon · 스플래시 splash · theme `#0A0A0A`) + favicon/apple-touch + OG(og.png) + README 배너(readme-banner.svg) + 랜딩 히어로(hero / hero-mobile)
 - [ ] 사이트 공통 푸터에 GitHub 링크(`https://github.com/KR20260603/clearkorea`) 추가 + 오픈소스 기여 경로 노출
 - [ ] 라이선스 표기: 푸터/문서/패키지 메타데이터에 `AGPL-3.0-only` 반영
 - [ ] Supabase 프로젝트 + 스키마 + RLS + Supavisor 풀링 + 타입 생성

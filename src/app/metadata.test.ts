@@ -8,7 +8,7 @@ describe("public SEO shell", () => {
   it("publishes bilingual landing metadata with OG image and hreflang", () => {
     expect(metadata.openGraph).toEqual(
       expect.objectContaining({
-        images: ["/assets/og.png"],
+        images: ["/og.png"],
         siteName: "ClearKorea",
       }),
     );
@@ -27,7 +27,7 @@ describe("public SEO shell", () => {
     expect(robots()).toEqual({
       rules: {
         userAgent: "*",
-        allow: ["/", "/assets/"],
+        allow: ["/"],
         disallow: ["/app", "/admin"],
       },
       sitemap: "https://clearkorea.com/sitemap.xml",
@@ -60,7 +60,7 @@ describe("public SEO shell", () => {
         background_color: "#0A0A0A",
         icons: expect.arrayContaining([
           expect.objectContaining({
-            src: "/assets/pwa-icon.png",
+            src: "/pwa-icon.png",
           }),
         ]),
       }),
