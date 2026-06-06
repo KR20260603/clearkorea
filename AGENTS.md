@@ -82,6 +82,7 @@ clearkorea/
 - For plan-driven execution, finish one top-level plan task at a time: implement, verify, mark the task checkbox, then commit that task before starting the next top-level task.
 - Do not combine multiple plan tasks into one commit. If a later task was started before the previous commit, split the work back into task-sized commits before continuing.
 - Once the user has approved committing during a plan execution session, treat each task's `Commit: YES` guidance as approval to commit that completed task immediately.
+- At the end of each large execution wave, run `$omo:init-deep` / `omo:init-deep` update mode before moving to the next wave. Sync `AGENTS.md` and the active `.omo/plans/*.md` with completed tasks, next-task pointers, new conventions, and any directory-boundary changes, then commit that durable guidance update as its own task-boundary commit.
 - Keep bulky runtime evidence local. Do not commit `.omo/evidence/`, `.omo/start-work/`, `.omo/boulder.json`, screenshots, server logs, or transient QA transcripts unless the user explicitly requests those artifacts in git.
 - Commit only durable project changes: source, tests, config, docs, migrations, plan checkbox updates, and concise policy/runbook updates.
 
