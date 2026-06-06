@@ -57,6 +57,25 @@ clearkorea/
 - Brand direction is SVG-first. Use `assets/readme-banner.svg` and `assets/pwa-icon.svg` as the clean vector style references.
 - Preserve generated asset names from `PLAN.md` and `IMAGE.md`: `pwa-icon.svg`, `pwa-icon.png`, `pwa-icon.jpg`, `hero.png`, `hero-mobile.png`, `splash.png`, `og.png`, `readme-banner.svg`, `square.png`, `ig-feed.png`, `ig-story.png`, `x-header.png`, `tile.png`.
 
+## PLANNING AND EXECUTION PHILOSOPHY
+
+- Treat `PLAN.md` as the product source of truth and keep v1 as one complete initial scope unless the user explicitly changes the scope.
+- Before creating or executing a work plan, read every root Markdown file that can affect scope, safety, implementation order, or contribution rules.
+- Keep future work plans decision-complete: each task should state exact references, acceptance criteria, QA evidence, dependency order, and commit guidance.
+- Use TDD for production behavior after the app scaffold exists: capture RED evidence before implementation and GREEN evidence after implementation.
+- Browser-facing work must be verified through the real browser surface with captured screenshots or action logs; tests alone are not enough.
+- For frontend UI, SVG image, raster image, visual design, layout, motion, or graphic polish work, explicitly use `$omo:frontend-ui-ux` and record the aesthetic direction before implementation.
+- Keep aesthetic direction compatible with the project brand: dark civic-tech, SVG-first, high contrast, restrained Korean-flag red/blue accents, and safety-conscious civic copy.
+- Do not let planning artifacts execute the work. Plans may live under `.omo/plans/`; drafts may live under `.omo/drafts/` and should be removed when the final plan is complete.
+
+## COMMIT STYLE
+
+- Use Conventional Commits: `<type>(<scope>): <imperative>`.
+- Do not use one-line-only messages for non-trivial implementation commits.
+- Prefer concise multi-line bodies with `- ` bullets, one clear point per line, focused on behavior, verification, safety, or operational impact.
+- For plan-driven implementation commits, include a footer such as `Plan: .omo/plans/<slug>.md`.
+- Do not auto-commit unless the user explicitly approves committing in that session.
+
 ## ANTI-PATTERNS (THIS PROJECT)
 
 - Do not defer v1 items out of the initial scope when implementing `PLAN.md`; the full listed v1 scope is one initial scope.
