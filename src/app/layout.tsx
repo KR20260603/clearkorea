@@ -10,6 +10,36 @@ export const metadata: Metadata = {
   },
   description:
     "A civic-tech platform for lawful participation, rally support, verified posts, and election transparency.",
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/",
+      ko: "/ko",
+    },
+  },
+  openGraph: {
+    title: "ClearKorea",
+    description:
+      "An online square for citizens demanding electoral transparency and a fair re-vote.",
+    url: "https://clearkorea.com/",
+    siteName: "ClearKorea",
+    images: ["/assets/og.png"],
+    locale: "en_US",
+    alternateLocale: ["ko_KR"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ClearKorea",
+    description:
+      "Your voice, on the record. A civic platform for Korean election transparency.",
+    images: ["/assets/og.png"],
+  },
+  icons: {
+    icon: "/assets/pwa-icon.svg",
+    apple: "/assets/pwa-icon.png",
+  },
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

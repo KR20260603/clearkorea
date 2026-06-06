@@ -8,8 +8,22 @@ const principles = [
 ];
 
 export default function LandingPage() {
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "ClearKorea",
+    url: "https://clearkorea.com",
+    sameAs: ["https://github.com/KR20260603/clearkorea"],
+  };
+
   return (
     <main className="min-h-screen px-6 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd),
+        }}
+      />
       <section className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col justify-between">
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">

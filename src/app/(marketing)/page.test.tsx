@@ -17,5 +17,8 @@ describe("LandingPage", () => {
       "href",
       "https://github.com/KR20260603/clearkorea",
     );
+    expect(
+      document.querySelector('script[type="application/ld+json"]'),
+    ).toHaveTextContent('"@type":"Organization"');
   });
 });

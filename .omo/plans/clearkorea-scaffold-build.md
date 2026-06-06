@@ -172,7 +172,7 @@ Wave 5: Task 16
   Plan: .omo/plans/clearkorea-scaffold-build.md
   ```
 
-- [ ] 2. Establish App Architecture, Design Tokens, Assets, And SEO Shell
+- [x] 2. Establish App Architecture, Design Tokens, Assets, And SEO Shell
 
   **What to do**: Build root layout, route groups, metadata, `robots.ts`, `sitemap.ts`, app providers, design tokens, responsive shell, footer GitHub link, PWA manifest, favicon/icon references, OG metadata, and asset references. Landing text must render as HTML, not baked into raster images.
   **Must NOT do**: Do not make a marketing-only placeholder app; do not overuse raster where SVG/HTML/CSS works; do not change public claims without aligning English/Korean copy.
