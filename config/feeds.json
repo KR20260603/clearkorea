@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "name": "ClearKorea 해외언론 피드 설정",
+    "updated": "2026-06-06",
+    "notes": [
+      "checked=true 는 2026-06-06 검색 결과에서 확인된 피드, checked=false 는 표준이지만 런타임 검증 권장.",
+      "Reuters/AP/AFP/Bloomberg/FT/WSJ 등은 공개 RSS가 제한·중단되어 googleNews 쿼리로 커버한다.",
+      "googleNews 가 핵심 catch-all. outlets 직접 RSS는 신뢰 출처 우선 노출용.",
+      "수집 후 keywordFilter 를 반드시 적용해서 한국 선거 관련 항목만 통과시킬 것."
+    ]
+  },
+
+  "keywordFilter": {
+    "logic": "AND",
+    "match": ["title", "description"],
+    "groups": {
+      "en": {
+        "korea": ["South Korea", "Korean", "Seoul"],
+        "topic": ["election", "ballot", "vote", "electoral", "recount", "polling", "vote-counting", "by-election", "local elections"]
+      },
+      "ja": {
+        "korea": ["韓国", "ソウル"],
+        "topic": ["選挙", "投票", "開票", "不正選挙", "再選挙", "投票用紙"]
+      },
+      "es": {
+        "korea": ["Corea del Sur", "Seúl"],
+        "topic": ["elección", "elecciones", "votación", "recuento", "comicios"]
+      },
+      "fr": {
+        "korea": ["Corée du Sud", "Séoul"],
+        "topic": ["élection", "scrutin", "vote", "dépouillement"]
+      },
+      "de": {
+        "korea": ["Südkorea", "Seoul"],
+        "topic": ["Wahl", "Wahlen", "Stimmzettel", "Auszählung"]
+      },
+      "ar": {
+        "korea": ["كوريا الجنوبية", "سيول"],
+        "topic": ["انتخابات", "تصويت", "فرز", "اقتراع"]
+      }
+    },
+    "boost": ["Jamsil", "ballot shortage", "NEC", "National Election Commission", "투표용지", "再選挙", "olympic park"]
+  },
+
+  "googleNews": {
+    "endpoint": "https://news.google.com/rss/search",
+    "buildHint": "url = `${endpoint}?q=${encodeURIComponent(q)}&hl=${hl}&gl=${gl}&ceid=${ceid}`",
+    "timeWindowHint": "최근만 원하면 q 끝에 ' when:7d' 또는 ' when:30d' 추가",
+    "queries": [
+      { "id": "en-us", "q": "\"South Korea\" (election OR ballot OR vote OR electoral OR recount)", "hl": "en-US", "gl": "US", "ceid": "US:en" },
+      { "id": "en-gb", "q": "\"South Korea\" (election OR ballot OR vote OR electoral OR recount)", "hl": "en-GB", "gl": "GB", "ceid": "GB:en" },
+      { "id": "en-in", "q": "\"South Korea\" (election OR ballot OR vote OR recount)", "hl": "en-IN", "gl": "IN", "ceid": "IN:en" },
+      { "id": "en-au", "q": "\"South Korea\" (election OR ballot OR vote OR recount)", "hl": "en-AU", "gl": "AU", "ceid": "AU:en" },
+      { "id": "en-sg", "q": "\"South Korea\" (election OR ballot OR vote OR recount)", "hl": "en-SG", "gl": "SG", "ceid": "SG:en" },
+      { "id": "ja-jp", "q": "韓国 (選挙 OR 投票 OR 開票 OR 再選挙)", "hl": "ja", "gl": "JP", "ceid": "JP:ja" },
+      { "id": "es-es", "q": "\"Corea del Sur\" (elecciones OR votación OR recuento)", "hl": "es", "gl": "ES", "ceid": "ES:es" },
+      { "id": "es-mx", "q": "\"Corea del Sur\" (elecciones OR votación OR recuento)", "hl": "es-419", "gl": "MX", "ceid": "MX:es-419" },
+      { "id": "fr-fr", "q": "\"Corée du Sud\" (élection OR scrutin OR vote OR dépouillement)", "hl": "fr", "gl": "FR", "ceid": "FR:fr" },
+      { "id": "de-de", "q": "Südkorea (Wahl OR Stimmzettel OR Auszählung)", "hl": "de", "gl": "DE", "ceid": "DE:de" },
+      { "id": "it-it", "q": "\"Corea del Sud\" (elezioni OR voto OR scrutinio)", "hl": "it", "gl": "IT", "ceid": "IT:it" },
+      { "id": "pt-br", "q": "\"Coreia do Sul\" (eleição OR votação OR apuração)", "hl": "pt-BR", "gl": "BR", "ceid": "BR:pt-419" },
+      { "id": "ar", "q": "\"كوريا الجنوبية\" (انتخابات OR تصويت OR فرز)", "hl": "ar", "gl": "EG", "ceid": "EG:ar" },
+      { "id": "tr", "q": "\"Güney Kore\" (seçim OR oy OR sandık)", "hl": "tr", "gl": "TR", "ceid": "TR:tr" },
+      { "id": "ru", "q": "\"Южная Корея\" (выборы OR голосование OR бюллетень)", "hl": "ru", "gl": "RU", "ceid": "RU:ru" },
+      { "id": "specific-en", "q": "South Korea (Jamsil OR \"ballot shortage\" OR \"vote counting\" OR re-election OR recount)", "hl": "en-US", "gl": "US", "ceid": "US:en" }
+    ]
+  },
+
+  "outlets": [
+    { "id": "bbc-world", "name": "BBC News (World)", "country": "UK", "region": "Europe", "lang": "en", "rss": "https://feeds.bbci.co.uk/news/world/rss.xml", "site": "https://www.bbc.com/news/world", "checked": true },
+    { "id": "bbc-asia", "name": "BBC News (Asia)", "country": "UK", "region": "Europe", "lang": "en", "rss": "https://feeds.bbci.co.uk/news/world/asia/rss.xml", "site": "https://www.bbc.com/news/world/asia", "checked": true },
+    { "id": "guardian-world", "name": "The Guardian (World)", "country": "UK", "region": "Europe", "lang": "en", "rss": "https://www.theguardian.com/world/rss", "site": "https://www.theguardian.com/world", "checked": true },
+    { "id": "skynews-world", "name": "Sky News (World)", "country": "UK", "region": "Europe", "lang": "en", "rss": "https://feeds.skynews.com/feeds/rss/world.xml", "site": "https://news.sky.com/world", "checked": true },
+    { "id": "france24-en", "name": "France 24 (English)", "country": "France", "region": "Europe", "lang": "en", "rss": "https://www.france24.com/en/rss", "site": "https://www.france24.com/en/", "checked": true },
+    { "id": "dw-en", "name": "Deutsche Welle (English)", "country": "Germany", "region": "Europe", "lang": "en", "rss": "https://rss.dw.com/rdf/rss-en-all", "site": "https://www.dw.com/en/", "checked": false },
+    { "id": "euronews", "name": "Euronews", "country": "EU", "region": "Europe", "lang": "en", "rss": "https://www.euronews.com/rss", "site": "https://www.euronews.com/", "checked": false },
+    { "id": "spiegel-intl", "name": "Der Spiegel (International)", "country": "Germany", "region": "Europe", "lang": "en", "rss": "https://www.spiegel.de/international/index.rss", "site": "https://www.spiegel.de/international/", "checked": false },
+    { "id": "lemonde-une", "name": "Le Monde (Une)", "country": "France", "region": "Europe", "lang": "fr", "rss": "https://www.lemonde.fr/rss/une.xml", "site": "https://www.lemonde.fr/", "checked": false },
+
+    { "id": "nyt-world", "name": "The New York Times (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "site": "https://www.nytimes.com/section/world", "checked": true },
+    { "id": "wapo-world", "name": "The Washington Post (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://feeds.washingtonpost.com/rss/world", "site": "https://www.washingtonpost.com/world/", "checked": true },
+    { "id": "cnn-world", "name": "CNN (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "http://rss.cnn.com/rss/edition_world.rss", "site": "https://edition.cnn.com/world", "checked": true },
+    { "id": "npr-world", "name": "NPR (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://feeds.npr.org/1004/rss.xml", "site": "https://www.npr.org/sections/world/", "checked": true },
+    { "id": "cnbc-world", "name": "CNBC (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "site": "https://www.cnbc.com/world/", "checked": true },
+    { "id": "yahoo-world", "name": "Yahoo News (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://news.yahoo.com/rss/world", "site": "https://news.yahoo.com/world/", "checked": true },
+    { "id": "abcnews-us-top", "name": "ABC News (US, Top Stories)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://abcnews.go.com/abcnews/topstories", "site": "https://abcnews.go.com/", "checked": false },
+    { "id": "seattletimes-world", "name": "The Seattle Times (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://www.seattletimes.com/nation-world/world/feed/", "site": "https://www.seattletimes.com/nation-world/world/", "checked": true },
+    { "id": "cbc-world", "name": "CBC News (World)", "country": "Canada", "region": "Americas", "lang": "en", "rss": "https://www.cbc.ca/webfeed/rss/rss-world", "site": "https://www.cbc.ca/news/world", "checked": true },
+
+    { "id": "kyodo-en", "name": "Kyodo News (English)", "country": "Japan", "region": "Asia", "lang": "en", "rss": "https://english.kyodonews.net/rss/all.xml", "site": "https://english.kyodonews.net/", "checked": true },
+    { "id": "japantimes", "name": "The Japan Times", "country": "Japan", "region": "Asia", "lang": "en", "rss": "https://www.japantimes.co.jp/feed/", "site": "https://www.japantimes.co.jp/", "checked": true },
+    { "id": "scmp", "name": "South China Morning Post", "country": "Hong Kong", "region": "Asia", "lang": "en", "rss": "https://www.scmp.com/rss/91/feed", "site": "https://www.scmp.com/", "checked": true },
+    { "id": "thediplomat", "name": "The Diplomat", "country": "US/Asia", "region": "Asia", "lang": "en", "rss": "https://thediplomat.com/feed/", "site": "https://thediplomat.com/", "checked": false },
+    { "id": "toi-top", "name": "The Times of India (Top Stories)", "country": "India", "region": "Asia", "lang": "en", "rss": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms", "site": "https://timesofindia.indiatimes.com/", "checked": true },
+
+    { "id": "aljazeera", "name": "Al Jazeera English", "country": "Qatar", "region": "MiddleEast", "lang": "en", "rss": "https://www.aljazeera.com/xml/rss/all.xml", "site": "https://www.aljazeera.com/", "checked": true },
+    { "id": "middleeasteye", "name": "Middle East Eye", "country": "UK/ME", "region": "MiddleEast", "lang": "en", "rss": "https://www.middleeasteye.net/rss", "site": "https://www.middleeasteye.net/", "checked": true },
+    { "id": "timesofisrael", "name": "The Times of Israel", "country": "Israel", "region": "MiddleEast", "lang": "en", "rss": "https://www.timesofisrael.com/feed/", "site": "https://www.timesofisrael.com/", "checked": false },
+
+    { "id": "abc-au-justin", "name": "ABC News (Australia, Just In)", "country": "Australia", "region": "Oceania", "lang": "en", "rss": "https://www.abc.net.au/news/feed/51120/rss.xml", "site": "https://www.abc.net.au/news/", "checked": false },
+    { "id": "smh-world", "name": "The Sydney Morning Herald (World)", "country": "Australia", "region": "Oceania", "lang": "en", "rss": "https://www.smh.com.au/rss/world.xml", "site": "https://www.smh.com.au/world", "checked": false }
+  ],
+
+  "viaGoogleNews": {
+    "note": "공개 RSS가 없거나 불안정해 googleNews 쿼리로만 수집하는 매체",
+    "outlets": [
+      "Reuters", "Associated Press (AP)", "Agence France-Presse (AFP)", "Bloomberg",
+      "The Wall Street Journal", "Financial Times", "The Economist", "POLITICO", "The Atlantic",
+      "The Globe and Mail", "CTV News", "Toronto Star",
+      "Al Arabiya English", "TRT World", "The National (UAE)",
+      "Nikkei Asia", "Channel NewsAsia", "The Straits Times", "NHK World-Japan",
+      "El País", "Corriere della Sera", "La Repubblica"
+    ]
+  }
+}

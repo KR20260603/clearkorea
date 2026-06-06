@@ -1,0 +1,58 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+!.env.local.example
+AGENTS.local.md
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+
+# Next.js / React build output
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel / Cloudflare / Supabase local state
+.vercel/
+.wrangler/
+.dev.vars
+.mf/
+.supabase/
+supabase/.branches/
+supabase/.temp/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package-manager caches
+.npm/
+.yarn/
+.pnpm-store/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Test and automation artifacts
+playwright-report/
+test-results/
+.nyc_output/
+
+# Generated temporary files
+tmp/
+temp/
+*.tmp
