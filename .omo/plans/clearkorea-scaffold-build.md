@@ -116,11 +116,14 @@ Wave 5: Tasks 10, 11, 12, 13, 14, 15
 Wave 6: Task 16
 
 ### Current Execution State
-- Completed through Task 2A in commit `e0012fc feat(shell): add unified branded app shell`.
-- Task 2A repaired the landing/app visual shell beyond its original narrow GitHub/assets scope: one GitHub affordance, `public/` root assets, `hero2.png` landing background, shared `ShellFrame`, `/app` `tile.png` background, and icon bottom dock.
-- Verified after Task 2A: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, plus Chrome viewport checks for `/` and `/app` at desktop and small mobile sizes down to `320x420`.
-- **Next task to execute after this task-boundary commit: Task 3.** Task 2B synced stale auth policy across `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, and contribution guidance.
-- Do not start Tasks 3 or 4 until Task 2B is committed or the user explicitly directs uncommitted continuation.
+- Completed through Wave 3.
+- Task 2A completed in commit `e0012fc feat(shell): add unified branded app shell`.
+- Task 2B completed in commit `89c8bcf docs(auth): sync Kakao Naver launch policy`.
+- Task 3 completed in commit `6616050 feat(db): add Supabase schema and policies`; it added local Supabase config, migration, RLS/storage policies, seed data, schema checks, project constants, and generated database types without mutating the hosted Supabase project.
+- Task 4 completed in commit `2cdc860 feat(copy): add safety and UI text contracts`; it added civic copy, safety text, URL validation, nickname contracts, env-name contract tests, and the official `.env.example` variable names.
+- Verified after Wave 3: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `node scripts/check-feeds.mjs config/feeds.json`, and `node scripts/check-supabase-schema.mjs supabase/migrations/20260606030000_initial_schema.sql supabase/seed.sql`.
+- **Next wave to execute after this init-deep task-boundary commit: Wave 4. Start with Task 5** to build Kakao/Naver auth, launch gate, role bootstrap, and production-safe nickname behavior.
+- Do not wire critical hosted Supabase/Vercel/Cloudflare/PostHog changes without explicit user approval. If a service integration is not critical to the current behavior, keep it abstracted and provide the final setup guide instead.
 
 ### Dependency Matrix
 | Task | Blocks | Blocked By |
