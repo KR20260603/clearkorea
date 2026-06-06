@@ -114,6 +114,13 @@ Wave 4: Tasks 5, 6, 7, 8, 9
 Wave 5: Tasks 10, 11, 12, 13, 14, 15
 Wave 6: Task 16
 
+### Current Execution State
+- Completed through Task 2A in commit `e0012fc feat(shell): add unified branded app shell`.
+- Task 2A repaired the landing/app visual shell beyond its original narrow GitHub/assets scope: one GitHub affordance, `public/` root assets, `hero2.png` landing background, shared `ShellFrame`, `/app` `tile.png` background, and icon bottom dock.
+- Verified after Task 2A: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, plus Chrome viewport checks for `/` and `/app` at desktop and small mobile sizes down to `320x420`.
+- **Next task to execute: Task 2B.** Sync stale auth policy across `PLAN.md`, `README.md`, `README.ko.md`, `AGENTS.md`, and related contribution/env guidance before starting Supabase schema/auth work.
+- Do not start Tasks 3 or 4 until Task 2B is complete and committed.
+
 ### Dependency Matrix
 | Task | Blocks | Blocked By |
 | --- | --- | --- |
@@ -230,7 +237,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(shell): add branded app foundation` | Files: `src/app/**`, `src/components/**`, `src/styles/**`, metadata files
 
-- [ ] 2A. Correct Landing GitHub Affordance And Public Asset Contract
+- [x] 2A. Correct Landing GitHub Affordance And Public Asset Contract
 
   **What to do**: Repair the partially completed landing shell so it matches the revised visual/product contract. Remove the duplicate header GitHub button, keep exactly one GitHub/contribution link in content or footer, verify the public asset contract stores brand files directly under `public/`, and use root static URLs such as `/pwa-icon.svg`, `/hero.png`, and `/og.png`.
   **Must NOT do**: Do not keep two GitHub buttons; do not leave a lone header GitHub CTA; do not add a custom asset route-handler workaround unless static `public/` serving is impossible; do not recreate a root `assets/` directory or a nested `public/assets/` directory.
@@ -244,12 +251,12 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - mandatory for the action hierarchy and screenshot review.
 
   **Acceptance Criteria**:
-  - [ ] `/` renders exactly one link to `https://github.com/KR20260603/clearkorea`.
-  - [ ] The remaining GitHub/contribution link is not in the top header/nav.
-  - [ ] `/pwa-icon.svg`, `/hero.png`, and `/hero-mobile.png` return HTTP 200 from static public assets.
-  - [ ] No `assets/` or `public/assets/` directory exists after the migration.
-  - [ ] No custom asset route handler exists unless the executor documents why static public assets cannot work.
-  - [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` exit 0.
+  - [x] `/` renders exactly one link to `https://github.com/KR20260603/clearkorea`.
+  - [x] The remaining GitHub/contribution link is not in the top header/nav.
+  - [x] `/pwa-icon.svg`, `/hero.png`, and `/hero-mobile.png` return HTTP 200 from static public assets.
+  - [x] No `assets/` or `public/assets/` directory exists after the migration.
+  - [x] No custom asset route handler exists unless the executor documents why static public assets cannot work.
+  - [x] `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` exit 0.
 
   **QA Scenarios**:
   ```
@@ -266,7 +273,7 @@ Wave 6: Task 16
     Evidence: .omo/evidence/task-2a-assets.txt
   ```
 
-  **Commit**: YES | Message: `fix(shell): align landing actions and assets` | Files: `src/app/(marketing)/**`, `public/**`, tests as needed
+  **Commit**: DONE | Commit: `e0012fc feat(shell): add unified branded app shell` | Files: `src/app/**`, `public/hero2.png`, tests, package metadata
 
 - [ ] 2B. Sync Auth Policy Across Docs And Plan Contracts
 
