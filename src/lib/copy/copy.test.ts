@@ -9,7 +9,7 @@ import {
 
 describe("copy contracts", () => {
   it("keeps app dock labels English-only and in plan order", () => {
-    expect(dockLabels).toEqual(["Home", "Rallies", "Square", "Live", "News"]);
+    expect(dockLabels).toEqual(["Today", "Rallies", "Square", "Live", "News"]);
   });
 
   it("keeps bilingual civic explanations and safety guardrails aligned", () => {

@@ -69,7 +69,7 @@ Build the complete ClearKorea v1 web application from the current prototype base
 ### Must Have
 - Preserve v1 as one initial scope.
 - Use route groups `(marketing)`, `(app)`, `(admin)`.
-- Use bottom dock labels exactly: `Home`, `Rallies`, `Square`, `Live`, `News`.
+- Use bottom dock labels exactly: `Today`, `Rallies`, `Square`, `Live`, `News`.
 - Keep public copy aligned in English/Korean when public claims change.
 - Keep civic wording around investigation, recurrence prevention, election transparency, and fair re-vote.
 - Label Seoul data as regional real-time congestion, not rally headcount.
@@ -111,7 +111,7 @@ Wave 1: Task 1
 Wave 2: Task 2
 Wave 2 Repair: Tasks 2A, 2B
 Wave 3: Tasks 3, 4
-Wave 4: Tasks 5, 6, 7, 8, 9
+Wave 4: Tasks 5, 6, 7, 7A, 7B, 8, 9
 Wave 5: Tasks 10, 11, 12, 13, 14, 15
 Wave 6: Task 16
 
@@ -123,7 +123,7 @@ Wave 6: Task 16
 - Task 4 completed in commit `2cdc860 feat(copy): add safety and UI text contracts`; it added civic copy, safety text, URL validation, nickname contracts, env-name contract tests, and the official `.env.example` variable names.
 - Verified after Wave 3: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `node scripts/check-feeds.mjs config/feeds.json`, and `node scripts/check-supabase-schema.mjs supabase/migrations/20260606030000_initial_schema.sql supabase/seed.sql`.
 - Task 5 completed (Wave 4): Kakao/Naver-only launch gate, provider registry (no Google), launch-mode SSOT with non-production-only guest bypass, Supabase SSR clients, Naver custom-OAuth bridge, auth routes + `/auth/start` choice UI, `/app` gate middleware, immutable Korean nickname generator, provider-qualified role bootstrap/sync, local `sync_user_role` migration, admin-application validator, and `docs/setup/auth-setup-guide.md` for deferred hosted wiring. Verified: `pnpm lint`, `pnpm typecheck`, `pnpm test` (93), `pnpm build`, and production browser QA of `/auth/start` (Kakao+Naver only, no Google/guest, 320x480). No hosted Supabase mutation performed.
-- **Next wave to execute: remainder of Wave 4 — Tasks 6, 7, 8, 9** (app shell/counters, Square voices, Rallies/congestion, Live/News/feeds).
+- **Next wave to execute: remainder of Wave 4 — Tasks 7B, 8, 9** (external Square URL previews, Rallies/congestion, Live/News/feeds).
 - Do not wire critical hosted Supabase/Vercel/Cloudflare/PostHog changes without explicit user approval. If a service integration is not critical to the current behavior, keep it abstracted and provide the final setup guide instead.
 
 ### Dependency Matrix
@@ -137,7 +137,9 @@ Wave 6: Task 16
 | 4 | 5, 6, 7, 8, 9 | 1, 2B |
 | 5 | 10, 16 | 2B, 3, 4 |
 | 6 | 10, 13, 16 | 2B, 3, 4 |
-| 7 | 13, 14, 16 | 2B, 3, 4 |
+| 7 | 7A, 7B, 13, 14, 16 | 2B, 3, 4 |
+| 7A | 8, 9, 10, 13, 16 | 6, 7 |
+| 7B | 13, 14, 16 | 7 |
 | 8 | 12, 16 | 2B, 3, 4 |
 | 9 | 12, 16 | 2B, 3, 4 |
 | 10 | 13, 14, 16 | 2B, 5, 6 |
@@ -376,7 +378,7 @@ Wave 6: Task 16
 
   **Acceptance Criteria**:
   - [x] `copy.ts` or equivalent contains English UI labels and bilingual explanatory copy.
-  - [x] Tests assert dock labels exactly `Home`, `Rallies`, `Square`, `Live`, `News`.
+  - [x] Tests assert dock labels exactly `Today`, `Rallies`, `Square`, `Live`, `News` after the Task 7A navigation revision.
   - [x] Tests assert no critical copy says organized election fraud is established fact.
   - [x] URL validation schema allows only approved SNS domains.
 
@@ -385,7 +387,7 @@ Wave 6: Task 16
   Scenario: App dock uses English-only labels
     Tool: Codex Browser/browser-use
     Steps: open http://127.0.0.1:3000/app in the Codex in-app Browser; inspect bottom dock text
-    Expected: exactly Home, Rallies, Square, Live, News
+    Expected: exactly Today, Rallies, Square, Live, News
     Evidence: .omo/evidence/task-4-dock-labels.png
 
   Scenario: Disallowed SNS URL fails validation
@@ -442,28 +444,28 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(auth): add Kakao Naver launch gate` | Files: `src/app/**`, `src/lib/auth/**`, `src/lib/nickname/**`, tests
 
-- [ ] 6. Build Five-Tab App Shell, Home Dashboard, And Counters
+- [x] 6. Build Five-Tab App Shell, Home Dashboard, And Counters
 
-  **What to do**: Implement `/app` shell with bottom dock, responsive layout, top profile toggle, Home dashboard, pinned participant/voice counters, highlight cards, cached polling, and regional congestion placeholder contract.
+  **What to do**: Implement `/app` shell with bottom dock, responsive layout, top profile toggle, Home dashboard, pinned participant/voice counters, highlight cards, cached polling, and regional congestion placeholder contract. After the Task 7A navigation revision, this dashboard moves to `/app/today` and `/app` becomes the Square entry surface.
   **Must NOT do**: Do not use realtime per-client sockets for public counters; do not label congestion as rally headcount.
 
   **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 10, 13, 16 | Blocked By: 2B, 3, 4
 
   **References**:
   - Pattern: `PLAN.md:183` - five-tab information architecture.
-  - Pattern: `PLAN.md:199` - Home dashboard.
+  - Pattern: `PLAN.md:199` - original Home dashboard, superseded by Task 7A Today summary routing.
   - Pattern: `PLAN.md:123` - cache/polling strategy.
   - Skill: `$omo:frontend-ui-ux` - mandatory for dashboard composition, bottom dock ergonomics, responsive spacing, and visual polish.
 
   **Acceptance Criteria**:
-  - [ ] `/app` defaults to Home or app entry with dock visible.
+  - [x] `/app` defaults to app entry with dock visible; Task 7A makes this entry Square and moves the dashboard to Today.
   - [ ] Participant and voice counters are visually pinned and poll cached snapshots.
   - [ ] Congestion label says regional real-time congestion and includes disclaimer.
   - [ ] Desktop dock spreads horizontally; mobile remains ergonomic.
 
   **QA Scenarios**:
   ```
-  Scenario: Home dashboard renders counters
+  Scenario: Dashboard renders counters
     Tool: Codex Browser/browser-use
     Steps: open http://127.0.0.1:3000/app; inspect pinned counter bar and dock
     Expected: two counters visible and dock labels exact
@@ -476,7 +478,7 @@ Wave 6: Task 16
     Evidence: .omo/evidence/task-6-counters-api.txt
   ```
 
-  **Commit**: YES | Message: `feat(app): add dashboard shell and counters` | Files: `src/app/(app)/**`, `src/components/app/**`, API routes, tests
+  **Commit**: YES | Message: `feat(app): add dashboard shell and counters` | Files: `src/app/(app)/**`, `src/components/app/**`, API routes, tests | Completed: `1c255b4`
 
 - [ ] 7. Build Square Voices, Reactions, Comments, Hot Sorting, And Sharing
 
@@ -520,6 +522,96 @@ Wave 6: Task 16
   ```
 
   **Commit**: YES | Message: `feat(square): add voices and hot feed` | Files: `src/app/(app)/square/**`, `src/lib/voices/**`, tests
+
+- [ ] 7B. Add External URL Bookmark Previews To Square Voices
+
+  **What to do**: Support Notion/Facebook/Discord-style bookmark/embed cards for the first public URL found in a Speak up body. While the user is drafting, detect the first URL, fetch safe metadata through a server route, and show whether it resolves into an embed preview before submission. In the feed, render the first resolved URL as a large-thumbnail card so an external Instagram/Threads/X/YouTube/community/article post can visually stand in for photo proof without ClearKorea hosting images.
+  **Must NOT do**: Do not add a file upload button. Do not store or proxy user-uploaded image files through ClearKorea storage. Do not restrict supported public URLs by political leaning or community type; progressive, conservative, social, community, Instagram, Threads, X, YouTube, and other lawful public sources are acceptable when metadata can be fetched safely. Do not execute remote scripts or trust remote HTML beyond metadata extraction.
+
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 13, 14, 16 | Blocked By: 7
+
+  **References**:
+  - Pattern: `src/components/app/speak-up-composer.tsx` - composer drafting and submit UX.
+  - Pattern: `src/components/app/voice-card.tsx` - voice feed card rendering.
+  - Pattern: `src/lib/validation/social-url.ts` - URL/domain validation constraints; extend without turning this into a partisan allowlist.
+  - Skill: `$omo:frontend-ui-ux` - mandatory for large-thumbnail embed card hierarchy, loading/error states, and no-upload affordance clarity.
+
+  **Acceptance Criteria**:
+  - [ ] Composer detects the first URL while drafting and shows whether an embed card can be resolved before submission.
+  - [ ] Metadata fetching happens server-side with safe timeout/size/content-type limits and no script execution.
+  - [ ] Voice cards render only the first resolved URL as a large-thumbnail bookmark/embed card with title, source, and outbound link.
+  - [ ] External thumbnail URLs are referenced as remote media; ClearKorea does not accept, store, proxy, or transform user-uploaded image files.
+  - [ ] No image/file upload UI is exposed for Square voice posting.
+  - [ ] Unsupported or blocked metadata fetches leave the original text/link usable without blocking the voice.
+
+  **QA Scenarios**:
+  ```
+  Scenario: Composer previews first embeddable URL
+    Tool: Codex Browser/browser-use
+    Steps: paste a public SNS/community/article URL into Speak up while drafting
+    Expected: a preview card appears before submit with title/source and a large thumbnail when metadata is available; no file upload button exists
+    Evidence: .omo/evidence/task-7b-url-preview-composer.png
+
+  Scenario: Voice renders external bookmark card
+    Tool: Codex Browser/browser-use
+    Steps: open Square feed containing a voice with multiple URLs
+    Expected: only the first resolvable URL renders as a large-thumbnail embed/bookmark card and the original link opens externally
+    Evidence: .omo/evidence/task-7b-url-preview-feed.png
+
+  Scenario: Unsupported URL remains safe text
+    Tool: curl + Codex Browser/browser-use
+    Steps: preview a URL that times out, blocks metadata, or lacks image metadata
+    Expected: no unsafe fetch output is rendered, no post is blocked solely because preview failed, and the link remains usable
+    Evidence: .omo/evidence/task-7b-url-preview-fallback.txt
+  ```
+
+  **Commit**: YES | Message: `feat(square): add external URL previews` | Files: `src/app/api/**`, `src/components/app/**`, `src/lib/voices/**`, `src/lib/validation/**`, tests, plan
+
+- [ ] 7A. Convert Home Dashboard Into KST Today Summary
+
+  **What to do**: Rename Home to Today in copy, dock tests, and app navigation. Keep Square as the practical home/feed at `/app`; redirect `/app/square` to `/app`; move the summary/dashboard route to `/app/today`. Scope all Today widgets to the current KST day (`00:00-23:59`): people who spoke up, voices, Seoul regional congestion, top voices, world press, and verified posts. Where cumulative context is useful, display `today/total` with the total smaller and softer, similar to older blog visit-counter patterns.
+  **Must NOT do**: Do not perform hosted DNS, Vercel, Cloudflare, OAuth callback, or production domain mutations in this task. Do not label Seoul congestion as rally headcount. Do not remove cumulative counter availability; show it only as secondary context on Today.
+
+  **Parallelization**: Can Parallel: YES | Wave 4 | Blocks: 8, 9, 10, 13, 16 | Blocked By: 6, 7
+
+  **References**:
+  - Pattern: `src/components/app/app-dock.tsx` - dock label, route, icon, and active-state contract.
+  - Pattern: `src/app/(app)/app/page.tsx` - Square should be the `/app` entry surface.
+  - Pattern: `src/app/(app)/app/today/page.tsx` - Today summary placeholder route.
+  - Pattern: `src/lib/counters/counters.ts` - extend counter snapshots to carry today and total counts.
+  - Skill: `$omo:frontend-ui-ux` - mandatory for Today summary hierarchy, `today/total` typographic treatment, and small-viewport dock verification.
+
+  **Acceptance Criteria**:
+  - [ ] Dock labels are exactly `Today`, `Rallies`, `Square`, `Live`, `News`.
+  - [ ] `/app` renders the Square feed/composer and marks Square active.
+  - [ ] `/app/square` redirects to `/app`.
+  - [ ] `/app/today` renders Today summary and marks Today active.
+  - [ ] Today counters show KST-current-day counts first and cumulative totals as smaller secondary context.
+  - [ ] Today highlights for Seoul congestion, top voices, world press, and verified posts are scoped to the KST day.
+  - [ ] Domain setup remains documented/deferred until deployment approval; no hosted domain changes are made.
+
+  **QA Scenarios**:
+  ```
+  Scenario: Square is the app home
+    Tool: Codex Browser/browser-use
+    Steps: open http://127.0.0.1:3000/app; inspect dock, composer, and active tab
+    Expected: Square feed/composer is visible, Square dock item is active, Today links to /app/today
+    Evidence: .omo/evidence/task-7a-square-home.png
+
+  Scenario: Today shows KST-scoped summary
+    Tool: Codex Browser/browser-use
+    Steps: open http://127.0.0.1:3000/app/today; inspect counters and summary cards
+    Expected: Today · KST heading, today/total counter treatment, congestion disclaimer, and today-scoped highlight copy
+    Evidence: .omo/evidence/task-7a-today-summary.png
+
+  Scenario: Legacy Square route redirects
+    Tool: curl
+    Steps: curl -i http://127.0.0.1:3000/app/square
+    Expected: redirect response to /app
+    Evidence: .omo/evidence/task-7a-square-redirect.txt
+  ```
+
+  **Commit**: YES | Message: `feat(app): make Square home and add Today summary` | Files: `src/app/(app)/app/**`, `src/components/app/**`, `src/lib/counters/**`, tests, plan
 
 - [ ] 8. Build Rallies, Seoul Congestion Proxy, Map, And Support Guide
 
@@ -596,7 +688,7 @@ Wave 6: Task 16
 
 - [ ] 10. Port Affected Stations Into `/app/stations`
 
-  **What to do**: Extract station seed data from the prototype into typed data or DB seed, port the ballot-box SVG visual into reusable components, implement `/app/stations`, 가나다 sorting, severity filters, responsive 3/4/6-column grid, summary stats, updated date, Home/Rallies entry links, and daily agentic Cron update structure.
+  **What to do**: Extract station seed data from the prototype into typed data or DB seed, port the ballot-box SVG visual into reusable components, implement `/app/stations`, 가나다 sorting, severity filters, responsive 3/4/6-column grid, summary stats, updated date, Today/Rallies entry links, and daily agentic Cron update structure.
   **Must NOT do**: Do not leave data hard to migrate; do not omit disclaimer; do not state the list proves fraud.
 
   **Parallelization**: Can Parallel: YES | Wave 5 | Blocks: 13, 14, 16 | Blocked By: 2B, 5, 6

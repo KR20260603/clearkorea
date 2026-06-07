@@ -1,52 +1,61 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import AppHomePage from "./page";
+import SquarePage from "./page";
 
-describe("AppHomePage dashboard", () => {
-  it("pins participant and voice counters at the top", () => {
-    render(<AppHomePage />);
+describe("SquarePage app entry", () => {
+  it("renders the Speak up composer as the app entry", () => {
+    render(<SquarePage />);
 
     expect(screen.getByRole("main")).toHaveClass("h-svh");
-
-    const participants = screen.getByTestId("counter-participants");
-    const voices = screen.getByTestId("counter-voices");
-    expect(within(participants).getByText("People who spoke up")).toBeInTheDocument();
-    expect(within(voices).getByText("Voices")).toBeInTheDocument();
-    expect(within(participants).getByText("0")).toBeInTheDocument();
-    expect(within(voices).getByText("0")).toBeInTheDocument();
+    expect(screen.getByLabelText("Speak up")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Speak up" })).toBeInTheDocument();
   });
 
-  it("labels Seoul data as regional congestion, never rally headcount", () => {
-    render(<AppHomePage />);
+  it("offers a latest tab plus hot time-window tabs with latest selected", () => {
+    render(<SquarePage />);
 
-    expect(
-      screen.getByText("Regional real-time congestion"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/regional real-time congestion for nearby public areas/i),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/rally headcount/i)).toBeNull();
+    const tablist = screen.getByRole("tablist", { name: "Feed sorting" });
+    const tabs = within(tablist)
+      .getAllByRole("tab")
+      .map((tab) => tab.textContent);
+    expect(tabs).toEqual(["Latest", "7d", "1d", "12h", "1h"]);
+    expect(within(tablist).getByRole("tab", { selected: true })).toHaveTextContent(
+      "Latest",
+    );
   });
 
-  it("keeps the five-tab dock visible with exact English labels", () => {
-    render(<AppHomePage />);
+  it("shows the empty square state until voices arrive", () => {
+    render(<SquarePage />);
+
+    const empty = screen.getByTestId("square-empty");
+    expect(
+      within(empty).getByText(/No public voices are visible yet/),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps Square active in the dock while Today has its own route", () => {
+    render(<SquarePage />);
 
     const dock = screen.getByRole("navigation", { name: "Primary app sections" });
     expect(dock.querySelectorAll("svg")).toHaveLength(5);
 
     const labels = within(dock)
-      .getAllByText(/^(Home|Rallies|Square|Live|News)$/)
+      .getAllByText(/^(Today|Rallies|Square|Live|News)$/)
       .map((element) => element.textContent);
-    expect(labels).toEqual(["Home", "Rallies", "Square", "Live", "News"]);
+    expect(labels).toEqual(["Today", "Rallies", "Square", "Live", "News"]);
 
-    expect(within(dock).getByRole("link", { name: /Home/ })).toHaveAttribute(
+    expect(within(dock).getByRole("link", { name: /Today/ })).toHaveAttribute(
       "href",
-      "/app",
+      "/app/today",
     );
+
+    const square = within(dock).getByRole("link", { name: /Square/ });
+    expect(square).toHaveAttribute("href", "/app");
+    expect(square).toHaveAttribute("aria-current", "page");
   });
 
   it("offers a login entry point that leads to the auth choices", () => {
-    render(<AppHomePage />);
+    render(<SquarePage />);
 
     expect(screen.getByRole("link", { name: /Log in/ })).toHaveAttribute(
       "href",

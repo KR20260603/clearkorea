@@ -1,11 +1,11 @@
-import { Home, Megaphone, Newspaper, RadioTower, UsersRound } from "lucide-react";
+import { CalendarDays, Landmark, Megaphone, Newspaper, RadioTower } from "lucide-react";
 import Link from "next/link";
 import { dockLabels } from "@/lib/copy/copy";
 
 const dockItems = [
-  { label: dockLabels[0], href: "/app", icon: Home },
+  { label: dockLabels[0], href: "/app/today", icon: CalendarDays },
   { label: dockLabels[1], href: "/app/rallies", icon: Megaphone },
-  { label: dockLabels[2], href: "/app/square", icon: UsersRound },
+  { label: dockLabels[2], href: "/app", icon: Landmark },
   { label: dockLabels[3], href: "/app/live", icon: RadioTower },
   { label: dockLabels[4], href: "/app/news", icon: Newspaper },
 ] as const;

@@ -1,30 +1,19 @@
-import { CircleUserRound, Megaphone, Newspaper, Quote } from "lucide-react";
+import { CircleUserRound, MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import { AppDock } from "@/components/app/app-dock";
-import { CountersBar } from "@/components/app/counters-bar";
-import { seoulCongestionDisclaimer } from "@/lib/copy/copy";
-import { emptyCountersSnapshot } from "@/lib/counters/counters";
+import { SpeakUpComposer } from "@/components/app/speak-up-composer";
+import { bilingualCopy } from "@/lib/copy/copy";
 import { ShellFrame } from "@/app/shell-frame";
 
-const highlights = [
-  {
-    icon: Quote,
-    title: "Top voices",
-    body: "The most-shared lawful testimonies rise here as the square fills.",
-  },
-  {
-    icon: Newspaper,
-    title: "World press",
-    body: "Foreign coverage of the election-transparency movement, headline only.",
-  },
-  {
-    icon: Megaphone,
-    title: "Verified posts",
-    body: "Statements from public and semi-public figures, reviewed before they appear.",
-  },
+const sortTabs = [
+  { id: "latest", label: "Latest" },
+  { id: "7d", label: "7d" },
+  { id: "1d", label: "1d" },
+  { id: "12h", label: "12h" },
+  { id: "1h", label: "1h" },
 ] as const;
 
-export default function AppHomePage() {
+export default function SquarePage() {
   return (
     <main className="isolate relative flex h-svh flex-col overflow-hidden bg-civic-bg px-[clamp(1rem,5vw,5rem)] py-[clamp(0.5rem,2svh,1.5rem)] text-white">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_-10%,rgba(0,71,160,0.16),transparent_55%)]" />
@@ -40,43 +29,46 @@ export default function AppHomePage() {
           </Link>
         }
       >
-        <CountersBar initial={emptyCountersSnapshot} />
+        <SpeakUpComposer />
 
-        <div className="mt-[clamp(0.75rem,2svh,1.25rem)] flex min-h-0 flex-1 flex-col gap-[clamp(0.75rem,2svh,1.25rem)] overflow-y-auto pb-[clamp(0.75rem,2svh,1.25rem)]">
-          <section
-            aria-label="Regional real-time congestion"
-            className="shrink-0 rounded-2xl border border-white/12 bg-black/25 p-[clamp(0.875rem,2.5vw,1.25rem)]"
-          >
-            <p className="text-[clamp(0.62rem,1.5svh,0.78rem)] font-bold uppercase tracking-[0.18em] text-zinc-300">
-              Regional real-time congestion
-            </p>
-            <p className="mt-2 text-[clamp(0.72rem,1.7svh,0.95rem)] leading-[1.45] text-zinc-200">
-              {seoulCongestionDisclaimer.en}
-            </p>
-            <p className="mt-1 text-[clamp(0.68rem,1.55svh,0.875rem)] leading-[1.45] text-zinc-400">
-              {seoulCongestionDisclaimer.ko}
-            </p>
-          </section>
+        <div
+          role="tablist"
+          aria-label="Feed sorting"
+          className="mt-[clamp(0.625rem,1.8svh,1rem)] flex shrink-0 gap-1.5 overflow-x-auto"
+        >
+          {sortTabs.map((tab, index) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={index === 0}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-[clamp(0.7rem,1.7svh,0.875rem)] font-semibold transition ${
+                index === 0
+                  ? "bg-white/12 text-white"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          <section
-            aria-label="Highlights"
-            className="grid shrink-0 gap-[clamp(0.625rem,1.8svh,1rem)] sm:grid-cols-3"
+        <div className="mt-[clamp(0.625rem,1.8svh,1rem)] flex min-h-0 flex-1 flex-col overflow-y-auto pb-[clamp(0.75rem,2svh,1.25rem)]">
+          <div
+            data-testid="square-empty"
+            className="grid flex-1 place-content-center gap-2 rounded-2xl border border-dashed border-white/12 bg-black/20 px-6 py-[clamp(1.5rem,6svh,3rem)] text-center"
           >
-            {highlights.map(({ icon: Icon, title, body }) => (
-              <article
-                key={title}
-                className="rounded-2xl border border-white/12 bg-black/25 p-[clamp(0.875rem,2.5vw,1.25rem)]"
-              >
-                <Icon aria-hidden="true" className="h-5 w-5 text-civic-red" />
-                <h2 className="mt-2 text-[clamp(0.9rem,2svh,1.0625rem)] font-bold text-white">
-                  {title}
-                </h2>
-                <p className="mt-1 text-[clamp(0.7rem,1.6svh,0.875rem)] leading-[1.45] text-zinc-400">
-                  {body}
-                </p>
-              </article>
-            ))}
-          </section>
+            <MessagesSquare
+              aria-hidden="true"
+              className="mx-auto h-8 w-8 text-zinc-500"
+            />
+            <p className="text-[clamp(0.8rem,1.9svh,1rem)] font-semibold text-zinc-200">
+              {bilingualCopy.squareEmpty.en}
+            </p>
+            <p className="text-[clamp(0.7rem,1.6svh,0.875rem)] leading-[1.45] text-zinc-400">
+              {bilingualCopy.squareEmpty.ko}
+            </p>
+          </div>
         </div>
 
         <AppDock activeHref="/app" />
