@@ -808,7 +808,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(security): add rate limits and cache guardrails` | Files: middleware/API routes, docs/checklists, tests
 
-- [ ] 13. Add Moderation AI, Human Review, And Operational Agents
+- [x] 13. Add Moderation AI, Human Review, And Operational Agents
 
   **What to do**: Implement hot-entry one-time AI moderation with `ai_checked`, soft-hide, popular review queue, report/dislike queue, trust scoring, appeal path, OpenAI key usage from env, station/rally/news/tip triage draft agents, anomaly detection hooks, and kill-switch/threshold settings through PostHog or DB settings as planned.
   **Must NOT do**: Do not run AI on every post by default; do not make AI final authority for ambiguous cases; do not print OpenAI key.
@@ -821,11 +821,11 @@ Wave 6: Task 16
   - Pattern: `AGENTS.local.md` - OpenAI key exists in `.env`.
 
   **Acceptance Criteria**:
-  - [ ] Voice entering hot feed triggers one AI moderation call only when `ai_checked=false`.
-  - [ ] Weak violations soft-hide and enter popular review queue.
-  - [ ] Admin can restore or permanently hide.
-  - [ ] AI agent Cron jobs create drafts/recommendations, not unreviewed destructive changes.
-  - [ ] Tests prove `ai_checked=true` prevents duplicate calls.
+  - [x] Voice entering hot feed triggers one AI moderation call only when `ai_checked=false`.
+  - [x] Weak violations soft-hide and enter popular review queue.
+  - [x] Admin can restore or permanently hide.
+  - [x] AI agent Cron jobs create drafts/recommendations, not unreviewed destructive changes.
+  - [x] Tests prove `ai_checked=true` prevents duplicate calls.
 
   **QA Scenarios**:
   ```
