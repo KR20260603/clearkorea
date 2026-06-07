@@ -691,7 +691,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(news): add live streams and feed ingestion` | Files: `src/app/(app)/live/**`, `src/app/(app)/news/**`, Cron/API routes, `.github/workflows/**`, tests
 
-- [ ] 10. Port Affected Stations Into `/app/stations`
+- [x] 10. Port Affected Stations Into `/app/stations`
 
   **What to do**: Extract station seed data from the prototype into typed data or DB seed, port the ballot-box SVG visual into reusable components, implement `/app/stations`, 가나다 sorting, severity filters, responsive 3/4/6-column grid, summary stats, updated date, Today/Rallies entry links, and daily agentic Cron update structure.
   **Must NOT do**: Do not leave data hard to migrate; do not omit disclaimer; do not state the list proves fraud.
@@ -705,12 +705,12 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - mandatory for ballot-box SVG design, severity color system, responsive grid, and visual accessibility.
 
   **Acceptance Criteria**:
-  - [ ] Executor records `$omo:frontend-ui-ux` aesthetic direction before porting the SVG board.
-  - [ ] `/app/stations` renders station board using typed data.
-  - [ ] Filters for all/red/orange/yellow work.
-  - [ ] Stations sort by Korean locale.
-  - [ ] Disclaimer text is present and tested.
-  - [ ] Cron update route/job can generate a review draft without automatically publishing unverified changes.
+  - [x] Executor records `$omo:frontend-ui-ux` aesthetic direction before porting the SVG board.
+  - [x] `/app/stations` renders station board using typed data.
+  - [x] Filters for all/red/orange/yellow work.
+  - [x] Stations sort by Korean locale.
+  - [x] Disclaimer text is present and tested.
+  - [x] Cron update route/job can generate a review draft without automatically publishing unverified changes.
 
   **QA Scenarios**:
   ```

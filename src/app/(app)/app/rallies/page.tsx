@@ -1,4 +1,4 @@
-import { CircleUserRound, Gauge, HeartHandshake, MapPin } from "lucide-react";
+import { CircleUserRound, Gauge, HeartHandshake, MapPin, Vote } from "lucide-react";
 import Link from "next/link";
 import { AppDock } from "@/components/app/app-dock";
 import { RalliesMap } from "@/components/app/rallies-map";
@@ -54,6 +54,24 @@ export default function RalliesPage() {
 
         <div className="mt-[clamp(0.625rem,1.8svh,1rem)] flex min-h-0 flex-1 flex-col gap-[clamp(0.625rem,1.8svh,1rem)] overflow-y-auto pb-[clamp(0.75rem,2svh,1.25rem)]">
           <RalliesMap rallies={rallies} />
+
+          <Link
+            href="/app/stations"
+            className="group flex shrink-0 items-center gap-3 rounded-2xl border border-white/12 bg-black/25 p-[clamp(0.75rem,2.2vw,1rem)] transition hover:border-white/30"
+          >
+            <Vote aria-hidden="true" className="h-5 w-5 shrink-0 text-civic-red" />
+            <span className="min-w-0">
+              <span className="block text-[clamp(0.8rem,1.85svh,0.95rem)] font-bold text-white">
+                Affected polling stations
+              </span>
+              <span className="block text-[clamp(0.66rem,1.5svh,0.8125rem)] text-zinc-400">
+                See the ballot-shortage board · 투표용지 부족 투표소
+              </span>
+            </span>
+            <span className="ml-auto shrink-0 text-zinc-500 transition group-hover:text-white" aria-hidden="true">
+              →
+            </span>
+          </Link>
 
           <section
             aria-label="Regional real-time congestion"
