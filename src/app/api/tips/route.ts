@@ -1,28 +1,14 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
+import { readServerSession } from "@/lib/auth/server-session";
 import { authorizeVoiceWrite } from "@/lib/voices/voice-authorization";
 import { validateTipSubmission } from "@/lib/tips/tip-submission";
 import { createRateLimitStore } from "@/lib/security/rate-limit";
 import { guardWrite } from "@/lib/security/write-guard";
 import { TURNSTILE_SECRET_ENV } from "@/lib/security/turnstile";
-import type { AppSessionIdentity } from "@/lib/auth/app-entry";
-
-type AuthClient = {
-  auth: { getUser(): PromiseLike<{ data: { user: { id: string } | null } }> };
-};
 
 const tipWriteStore = createRateLimitStore();
-
-async function readSession(
-  client: AuthClient | null,
-): Promise<AppSessionIdentity | null> {
-  if (!client) {
-    return null;
-  }
-  const { data } = await client.auth.getUser();
-  return data.user ? { authUserId: data.user.id } : null;
-}
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -31,7 +17,7 @@ export async function POST(request: Request) {
     setAll: () => {},
   });
 
-  const session = await readSession(client);
+  const session = await readServerSession(client);
   const authorization = authorizeVoiceWrite({ session });
   if (!authorization.allowed) {
     return NextResponse.json({ error: authorization.reason }, { status: 401 });

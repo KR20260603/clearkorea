@@ -7,7 +7,8 @@ import { createRateLimitStore } from "@/lib/security/rate-limit";
 import { guardWrite } from "@/lib/security/write-guard";
 import { TURNSTILE_SECRET_ENV } from "@/lib/security/turnstile";
 
-const voiceWriteStore = createRateLimitStore();
+const reactionStore = createRateLimitStore();
+const KINDS = new Set(["like", "dislike"]);
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -23,14 +24,14 @@ export async function POST(request: Request) {
   }
 
   const guard = await guardWrite({
-    store: voiceWriteStore,
-    key: `voice:${session?.authUserId ?? "dev-guest"}`,
+    store: reactionStore,
+    key: `reaction:${session?.authUserId ?? "dev-guest"}`,
     turnstileToken: request.headers.get("cf-turnstile-response"),
     turnstileSecret: process.env[TURNSTILE_SECRET_ENV],
   });
   if (guard.kind === "rate-limited") {
     return NextResponse.json(
-      { error: "You are posting too fast. Try again shortly." },
+      { error: "You are reacting too fast. Try again shortly." },
       { status: 429, headers: { "Retry-After": String(Math.ceil(guard.retryAfterMs / 1000)) } },
     );
   }
@@ -41,28 +42,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = (await request.json().catch(() => null)) as { content?: unknown } | null;
-  const content = typeof body?.content === "string" ? body.content.trim() : "";
-  if (content.length < 1 || content.length > 2000) {
-    return NextResponse.json(
-      { error: "A voice must be between 1 and 2000 characters." },
-      { status: 400 },
-    );
+  const body = (await request.json().catch(() => null)) as
+    | { voiceId?: unknown; kind?: unknown }
+    | null;
+  const voiceId = typeof body?.voiceId === "number" ? body.voiceId : null;
+  const kind = typeof body?.kind === "string" ? body.kind : "";
+  if (voiceId === null || !KINDS.has(kind)) {
+    return NextResponse.json({ error: "Invalid reaction." }, { status: 400 });
   }
 
   if (!client) {
     return NextResponse.json(
-      { error: "The voice service is not configured yet." },
+      { error: "Reactions are not configured yet." },
       { status: 503 },
     );
   }
 
-  return NextResponse.json({ status: "accepted" }, { status: 202 });
-}
-
-export async function GET() {
-  return NextResponse.json(
-    { voices: [] },
-    { headers: { "Cache-Control": "public, s-maxage=10, stale-while-revalidate=20" } },
-  );
+  return NextResponse.json({ status: "accepted", voiceId, kind }, { status: 202 });
 }

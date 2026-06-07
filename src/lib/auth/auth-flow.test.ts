@@ -108,29 +108,40 @@ describe("resolveCallbackRedirect", () => {
 
 describe("resolveNaverCallback", () => {
   it("rejects a missing or mismatched state to block CSRF", async () => {
+    const bridge = { link: vi.fn() };
     await expect(
-      resolveNaverCallback({ code: "c", state: "a", expectedState: "b", exchanger: null }),
+      resolveNaverCallback({ code: "c", state: "a", expectedState: "b", bridge }),
     ).resolves.toBe("/?auth=error");
     await expect(
-      resolveNaverCallback({ code: "c", state: null, expectedState: "b", exchanger: null }),
+      resolveNaverCallback({ code: "c", state: null, expectedState: "b", bridge }),
     ).resolves.toBe("/?auth=error");
     await expect(
-      resolveNaverCallback({ code: "c", state: "a", expectedState: null, exchanger: null }),
+      resolveNaverCallback({ code: "c", state: "a", expectedState: null, bridge }),
     ).resolves.toBe("/?auth=error");
+    expect(bridge.link).not.toHaveBeenCalled();
   });
 
-  it("exchanges the code when the state matches", async () => {
-    const exchanger = {
-      auth: { exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }) },
-    };
+  it("links the account when the bridge succeeds and state matches", async () => {
+    const bridge = { link: vi.fn().mockResolvedValue("linked" as const) };
     await expect(
-      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", exchanger }),
+      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", bridge }),
     ).resolves.toBe("/app");
   });
 
-  it("shows a safe notice when the bridge is unconfigured", async () => {
+  it("shows a safe notice when the bridge is unconfigured or unavailable", async () => {
     await expect(
-      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", exchanger: null }),
+      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", bridge: null }),
     ).resolves.toBe("/?auth=unavailable");
+    const unavailable = { link: vi.fn().mockResolvedValue("unavailable" as const) };
+    await expect(
+      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", bridge: unavailable }),
+    ).resolves.toBe("/?auth=unavailable");
+  });
+
+  it("returns a safe error when the bridge fails", async () => {
+    const bridge = { link: vi.fn().mockResolvedValue("failed" as const) };
+    await expect(
+      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", bridge }),
+    ).resolves.toBe("/?auth=error");
   });
 });

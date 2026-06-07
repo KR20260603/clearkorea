@@ -71,13 +71,23 @@ export async function resolveCallbackRedirect(input: {
   return error ? "/?auth=error" : "/app";
 }
 
-// Naver uses a custom OAuth bridge with a CSRF state cookie. The callback must
-// reject any request whose state does not match the cookie before exchanging.
+export type NaverLinkOutcome = "linked" | "unavailable" | "failed";
+
+export type NaverBridge = {
+  link(input: {
+    readonly code: string;
+    readonly state: string;
+  }): Promise<NaverLinkOutcome>;
+};
+
+// Naver is a custom OAuth bridge (not a Supabase built-in provider), so its code
+// is never passed to Supabase exchangeCodeForSession. The callback rejects any
+// request whose CSRF state does not match the cookie before linking.
 export async function resolveNaverCallback(input: {
   readonly code: string | null;
   readonly state: string | null;
   readonly expectedState: string | null;
-  readonly exchanger: CodeExchanger | null;
+  readonly bridge: NaverBridge | null;
 }): Promise<string> {
   if (
     !input.state ||
@@ -86,5 +96,18 @@ export async function resolveNaverCallback(input: {
   ) {
     return "/?auth=error";
   }
-  return resolveCallbackRedirect({ code: input.code, exchanger: input.exchanger });
+  if (!input.code) {
+    return "/?auth=error";
+  }
+  if (!input.bridge) {
+    return "/?auth=unavailable";
+  }
+  const outcome = await input.bridge.link({ code: input.code, state: input.state });
+  if (outcome === "linked") {
+    return "/app";
+  }
+  if (outcome === "unavailable") {
+    return "/?auth=unavailable";
+  }
+  return "/?auth=error";
 }

@@ -65,3 +65,55 @@ export function identityFromNaverProfile(profile: unknown): ProviderIdentity {
 
   return { provider: "naver", subject };
 }
+
+type FetchImpl = (input: string, init?: RequestInit) => Promise<Response>;
+
+export type NaverTokenResult =
+  | { readonly kind: "unavailable" }
+  | { readonly kind: "ok"; readonly accessToken: string }
+  | { readonly kind: "failed" };
+
+// Deferred boundary: with no client credentials this returns unavailable and never hits the network.
+export async function exchangeNaverCode(input: {
+  readonly code: string;
+  readonly state: string;
+  readonly clientId: string | undefined;
+  readonly clientSecret: string | undefined;
+  readonly fetchImpl?: FetchImpl;
+}): Promise<NaverTokenResult> {
+  if (!input.clientId || !input.clientSecret) {
+    return { kind: "unavailable" };
+  }
+  try {
+    const url = new URL("https://nid.naver.com/oauth2.0/token");
+    url.searchParams.set("grant_type", "authorization_code");
+    url.searchParams.set("client_id", input.clientId);
+    url.searchParams.set("client_secret", input.clientSecret);
+    url.searchParams.set("code", input.code);
+    url.searchParams.set("state", input.state);
+    const response = await (input.fetchImpl ?? fetch)(url.toString(), {
+      method: "POST",
+    });
+    const data = (await response.json()) as { access_token?: string };
+    return typeof data.access_token === "string" && data.access_token.length > 0
+      ? { kind: "ok", accessToken: data.access_token }
+      : { kind: "failed" };
+  } catch {
+    return { kind: "failed" };
+  }
+}
+
+export async function fetchNaverIdentity(input: {
+  readonly accessToken: string;
+  readonly fetchImpl?: FetchImpl;
+}): Promise<ProviderIdentity | null> {
+  try {
+    const response = await (input.fetchImpl ?? fetch)(
+      "https://openapi.naver.com/v1/nid/me",
+      { headers: { authorization: `Bearer ${input.accessToken}` } },
+    );
+    return identityFromNaverProfile(await response.json());
+  } catch {
+    return null;
+  }
+}

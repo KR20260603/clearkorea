@@ -1,9 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   buildNaverAuthorizationUrl,
+  exchangeNaverCode,
+  fetchNaverIdentity,
   identityFromNaverProfile,
   parseNaverAuthorizationResponse,
 } from "./naver";
+
+function jsonResponse(body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  });
+}
 
 describe("naver oauth bridge", () => {
   it("builds a Naver authorize URL without leaking secrets", () => {
@@ -56,5 +65,62 @@ describe("naver oauth bridge", () => {
       identityFromNaverProfile({ resultcode: "024", message: "auth fail", response: {} }),
     ).toThrow();
     expect(() => identityFromNaverProfile({ resultcode: "00", response: {} })).toThrow();
+  });
+});
+
+describe("exchangeNaverCode", () => {
+  it("is unavailable without client credentials and never calls the network", async () => {
+    const fetchImpl = vi.fn();
+    const result = await exchangeNaverCode({
+      code: "c",
+      state: "s",
+      clientId: undefined,
+      clientSecret: undefined,
+      fetchImpl,
+    });
+    expect(result.kind).toBe("unavailable");
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("returns the access token when Naver exchanges the code", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ access_token: "naver-token" }));
+    const result = await exchangeNaverCode({
+      code: "c",
+      state: "s",
+      clientId: "id",
+      clientSecret: "secret",
+      fetchImpl,
+    });
+    expect(result).toEqual({ kind: "ok", accessToken: "naver-token" });
+  });
+
+  it("fails without leaking the secret when the exchange errors", async () => {
+    const fetchImpl = vi.fn(async () => {
+      throw new Error("network");
+    });
+    const result = await exchangeNaverCode({
+      code: "c",
+      state: "s",
+      clientId: "id",
+      clientSecret: "super-secret",
+      fetchImpl,
+    });
+    expect(result.kind).toBe("failed");
+    expect(JSON.stringify(result)).not.toContain("super-secret");
+  });
+});
+
+describe("fetchNaverIdentity", () => {
+  it("resolves the provider identity from the profile endpoint", async () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse({ resultcode: "00", response: { id: "naver-1" } }),
+    );
+    const identity = await fetchNaverIdentity({ accessToken: "t", fetchImpl });
+    expect(identity).toEqual({ provider: "naver", subject: "naver-1" });
+  });
+
+  it("returns null when the profile lookup fails", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ resultcode: "024", response: {} }));
+    expect(await fetchNaverIdentity({ accessToken: "t", fetchImpl })).toBeNull();
   });
 });

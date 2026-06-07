@@ -1,11 +1,16 @@
+"use client";
+
 import {
   ExternalLink,
   MessageCircle,
+  Send,
   Share2,
   ThumbsDown,
   ThumbsUp,
   UserRound,
 } from "lucide-react";
+import Link from "next/link";
+import { useState, type FormEvent } from "react";
 
 export type VoiceEmbed = {
   readonly url: string;
@@ -66,20 +71,84 @@ function VoiceEmbedCard({ embed }: { embed: VoiceEmbed }) {
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 
-const actions = [
-  { key: "like", icon: ThumbsUp, label: "Like" },
-  { key: "dislike", icon: ThumbsDown, label: "Dislike" },
-  { key: "comment", icon: MessageCircle, label: "Comment" },
-  { key: "share", icon: Share2, label: "Share" },
-] as const;
+type Counts = {
+  like: number;
+  dislike: number;
+  comment: number;
+  share: number;
+};
+
+type ActionStatus =
+  | { readonly kind: "idle" }
+  | { readonly kind: "needs-auth" }
+  | { readonly kind: "unavailable" }
+  | { readonly kind: "shared" }
+  | { readonly kind: "comment-queued" };
 
 export function VoiceCard({ voice }: { voice: VoiceCardData }) {
-  const counts: Record<(typeof actions)[number]["key"], number> = {
+  const [counts, setCounts] = useState<Counts>({
     like: voice.likeCount,
     dislike: voice.dislikeCount,
     comment: voice.commentCount,
     share: voice.shareCount,
-  };
+  });
+  const [status, setStatus] = useState<ActionStatus>({ kind: "idle" });
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  async function react(kind: "like" | "dislike") {
+    setStatus({ kind: "idle" });
+    setCounts((prev) => ({ ...prev, [kind]: prev[kind] + 1 }));
+    const response = await fetch("/api/reactions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ voiceId: voice.id, kind }),
+    }).catch(() => null);
+    if (response?.status === 401) {
+      setCounts((prev) => ({ ...prev, [kind]: prev[kind] - 1 }));
+      setStatus({ kind: "needs-auth" });
+    } else if (response?.status === 503) {
+      setStatus({ kind: "unavailable" });
+    }
+  }
+
+  async function share() {
+    const target = voice.embed?.url ?? "https://clearkorea.com/app";
+    try {
+      await navigator.clipboard?.writeText(target);
+    } catch {
+      // Clipboard may be unavailable; the share still counts optimistically.
+    }
+    setCounts((prev) => ({ ...prev, share: prev.share + 1 }));
+    setStatus({ kind: "shared" });
+  }
+
+  async function submitComment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const content = commentText.trim();
+    if (!content) {
+      return;
+    }
+    const response = await fetch("/api/comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ voiceId: voice.id, content }),
+    }).catch(() => null);
+    if (response?.status === 401) {
+      setStatus({ kind: "needs-auth" });
+      return;
+    }
+    if (response?.status === 503) {
+      setStatus({ kind: "unavailable" });
+      return;
+    }
+    if (response?.ok || response?.status === 202) {
+      setCounts((prev) => ({ ...prev, comment: prev.comment + 1 }));
+      setCommentText("");
+      setCommentOpen(false);
+      setStatus({ kind: "comment-queued" });
+    }
+  }
 
   return (
     <article className="rounded-2xl border border-white/12 bg-black/25 p-[clamp(0.875rem,2.5vw,1.25rem)]">
@@ -105,18 +174,83 @@ export function VoiceCard({ voice }: { voice: VoiceCardData }) {
       {voice.embed ? <VoiceEmbedCard embed={voice.embed} /> : null}
 
       <footer className="mt-3 flex items-center gap-[clamp(0.75rem,4vw,1.75rem)] border-t border-white/8 pt-2.5">
-        {actions.map(({ key, icon: Icon, label }) => (
-          <button
-            key={key}
-            type="button"
-            aria-label={label}
-            className="inline-flex items-center gap-1.5 text-[clamp(0.66rem,1.5svh,0.8125rem)] text-zinc-400 transition hover:text-white"
-          >
-            <Icon aria-hidden="true" className="h-4 w-4" />
-            <span className="tabular-nums">{numberFormatter.format(counts[key])}</span>
-          </button>
-        ))}
+        <button
+          type="button"
+          aria-label="Like"
+          onClick={() => react("like")}
+          className="inline-flex items-center gap-1.5 text-[clamp(0.66rem,1.5svh,0.8125rem)] text-zinc-400 transition hover:text-white"
+        >
+          <ThumbsUp aria-hidden="true" className="h-4 w-4" />
+          <span className="tabular-nums">{numberFormatter.format(counts.like)}</span>
+        </button>
+        <button
+          type="button"
+          aria-label="Dislike"
+          onClick={() => react("dislike")}
+          className="inline-flex items-center gap-1.5 text-[clamp(0.66rem,1.5svh,0.8125rem)] text-zinc-400 transition hover:text-white"
+        >
+          <ThumbsDown aria-hidden="true" className="h-4 w-4" />
+          <span className="tabular-nums">{numberFormatter.format(counts.dislike)}</span>
+        </button>
+        <button
+          type="button"
+          aria-label="Comment"
+          aria-expanded={commentOpen}
+          onClick={() => setCommentOpen((open) => !open)}
+          className="inline-flex items-center gap-1.5 text-[clamp(0.66rem,1.5svh,0.8125rem)] text-zinc-400 transition hover:text-white"
+        >
+          <MessageCircle aria-hidden="true" className="h-4 w-4" />
+          <span className="tabular-nums">{numberFormatter.format(counts.comment)}</span>
+        </button>
+        <button
+          type="button"
+          aria-label="Share"
+          onClick={share}
+          className="inline-flex items-center gap-1.5 text-[clamp(0.66rem,1.5svh,0.8125rem)] text-zinc-400 transition hover:text-white"
+        >
+          <Share2 aria-hidden="true" className="h-4 w-4" />
+          <span className="tabular-nums">{numberFormatter.format(counts.share)}</span>
+        </button>
       </footer>
+
+      {commentOpen ? (
+        <form onSubmit={submitComment} className="mt-2.5 flex items-end gap-2">
+          <label htmlFor={`comment-${voice.id}`} className="sr-only">
+            Add a comment
+          </label>
+          <textarea
+            id={`comment-${voice.id}`}
+            data-ph-mask
+            value={commentText}
+            onChange={(event) => setCommentText(event.target.value)}
+            rows={2}
+            maxLength={2000}
+            placeholder="Add a lawful comment"
+            className="min-w-0 flex-1 resize-none rounded-xl border border-white/12 bg-black/40 px-3 py-2 text-[clamp(0.72rem,1.65svh,0.875rem)] text-white placeholder:text-zinc-600 focus:border-white/40 focus:outline-none"
+          />
+          <button
+            type="submit"
+            aria-label="Submit comment"
+            disabled={commentText.trim().length === 0}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-40"
+          >
+            <Send aria-hidden="true" className="h-4 w-4" />
+          </button>
+        </form>
+      ) : null}
+
+      {status.kind !== "idle" ? (
+        <p aria-live="polite" className="mt-2 text-[clamp(0.62rem,1.4svh,0.75rem)] text-zinc-400">
+          {status.kind === "needs-auth" ? (
+            <Link href="/auth/start" className="font-semibold text-civic-blue underline">
+              Link a Kakao or Naver account to join in.
+            </Link>
+          ) : null}
+          {status.kind === "unavailable" ? "This connects when the service is configured." : null}
+          {status.kind === "shared" ? "Link copied to your clipboard." : null}
+          {status.kind === "comment-queued" ? "Your comment is queued for review." : null}
+        </p>
+      ) : null}
     </article>
   );
 }
