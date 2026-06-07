@@ -123,7 +123,10 @@ Wave 6: Task 16
 - Task 4 completed in commit `2cdc860 feat(copy): add safety and UI text contracts`; it added civic copy, safety text, URL validation, nickname contracts, env-name contract tests, and the official `.env.example` variable names.
 - Verified after Wave 3: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `node scripts/check-feeds.mjs config/feeds.json`, and `node scripts/check-supabase-schema.mjs supabase/migrations/20260606030000_initial_schema.sql supabase/seed.sql`.
 - Task 5 completed (Wave 4): Kakao/Naver-only launch gate, provider registry (no Google), launch-mode SSOT with non-production-only guest bypass, Supabase SSR clients, Naver custom-OAuth bridge, auth routes + `/auth/start` choice UI, `/app` gate middleware, immutable Korean nickname generator, provider-qualified role bootstrap/sync, local `sync_user_role` migration, admin-application validator, and `docs/setup/auth-setup-guide.md` for deferred hosted wiring. Verified: `pnpm lint`, `pnpm typecheck`, `pnpm test` (93), `pnpm build`, and production browser QA of `/auth/start` (Kakao+Naver only, no Google/guest, 320x480). No hosted Supabase mutation performed.
-- **Next wave to execute: remainder of Wave 4 — Tasks 7B, 8, 9** (external Square URL previews, Rallies/congestion, Live/News/feeds).
+- Task 6 completed in commit `1c255b4 feat(app): add dashboard shell and counters`; five-tab app shell, dock, pinned counters, cached counters API.
+- Task 7 + 7A completed in commit `04aba5e feat(square): add voices and today routing`; Square composer/feed contracts, hot-score sorting, unauthenticated write guard, Square-as-home routing, Today (KST) summary route, and `Today/Rallies/Square/Live/News` dock labels.
+- Task 7B completed (Wave 4): server-side first-URL metadata preview (`/api/link-preview`) with SSRF guard (rejects loopback/link-local/private/metadata hosts), HTML-only + timeout + size limits, OpenGraph/`<title>` extraction with safe-image filtering, composer draft preview (resolving/resolved/unsupported, no file upload), and large-thumbnail bookmark embed card on voices. Verified: `pnpm lint`, `pnpm typecheck`, `pnpm test` (140), `pnpm build`, real-browser composer preview QA, and API SSRF/og:image probes. No hosted Supabase mutation.
+- **Next wave to execute: remainder of Wave 4 — Tasks 8, 9** (Rallies/Seoul congestion proxy, Live/News/feed ingestion).
 - Do not wire critical hosted Supabase/Vercel/Cloudflare/PostHog changes without explicit user approval. If a service integration is not critical to the current behavior, keep it abstracted and provide the final setup guide instead.
 
 ### Dependency Matrix
@@ -480,7 +483,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(app): add dashboard shell and counters` | Files: `src/app/(app)/**`, `src/components/app/**`, API routes, tests | Completed: `1c255b4`
 
-- [ ] 7. Build Square Voices, Reactions, Comments, Hot Sorting, And Sharing
+- [x] 7. Build Square Voices, Reactions, Comments, Hot Sorting, And Sharing
 
   **What to do**: Implement Speak up composer, voices feed, comments, likes/dislikes, share actions, report entrypoint, latest sorting, 7d/1d/12h/1h hot sorting, view/share counters, and Instagram/Threads-style card layout.
   **Must NOT do**: Do not store nickname strings on voice/comment rows; render through `user_id` joins.
@@ -523,7 +526,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(square): add voices and hot feed` | Files: `src/app/(app)/square/**`, `src/lib/voices/**`, tests
 
-- [ ] 7B. Add External URL Bookmark Previews To Square Voices
+- [x] 7B. Add External URL Bookmark Previews To Square Voices
 
   **What to do**: Support Notion/Facebook/Discord-style bookmark/embed cards for the first public URL found in a Speak up body. While the user is drafting, detect the first URL, fetch safe metadata through a server route, and show whether it resolves into an embed preview before submission. In the feed, render the first resolved URL as a large-thumbnail card so an external Instagram/Threads/X/YouTube/community/article post can visually stand in for photo proof without ClearKorea hosting images.
   **Must NOT do**: Do not add a file upload button. Do not store or proxy user-uploaded image files through ClearKorea storage. Do not restrict supported public URLs by political leaning or community type; progressive, conservative, social, community, Instagram, Threads, X, YouTube, and other lawful public sources are acceptable when metadata can be fetched safely. Do not execute remote scripts or trust remote HTML beyond metadata extraction.
@@ -537,12 +540,12 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - mandatory for large-thumbnail embed card hierarchy, loading/error states, and no-upload affordance clarity.
 
   **Acceptance Criteria**:
-  - [ ] Composer detects the first URL while drafting and shows whether an embed card can be resolved before submission.
-  - [ ] Metadata fetching happens server-side with safe timeout/size/content-type limits and no script execution.
-  - [ ] Voice cards render only the first resolved URL as a large-thumbnail bookmark/embed card with title, source, and outbound link.
-  - [ ] External thumbnail URLs are referenced as remote media; ClearKorea does not accept, store, proxy, or transform user-uploaded image files.
-  - [ ] No image/file upload UI is exposed for Square voice posting.
-  - [ ] Unsupported or blocked metadata fetches leave the original text/link usable without blocking the voice.
+  - [x] Composer detects the first URL while drafting and shows whether an embed card can be resolved before submission.
+  - [x] Metadata fetching happens server-side with safe timeout/size/content-type limits and no script execution.
+  - [x] Voice cards render only the first resolved URL as a large-thumbnail bookmark/embed card with title, source, and outbound link.
+  - [x] External thumbnail URLs are referenced as remote media; ClearKorea does not accept, store, proxy, or transform user-uploaded image files.
+  - [x] No image/file upload UI is exposed for Square voice posting.
+  - [x] Unsupported or blocked metadata fetches leave the original text/link usable without blocking the voice.
 
   **QA Scenarios**:
   ```
@@ -567,7 +570,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(square): add external URL previews` | Files: `src/app/api/**`, `src/components/app/**`, `src/lib/voices/**`, `src/lib/validation/**`, tests, plan
 
-- [ ] 7A. Convert Home Dashboard Into KST Today Summary
+- [x] 7A. Convert Home Dashboard Into KST Today Summary
 
   **What to do**: Rename Home to Today in copy, dock tests, and app navigation. Keep Square as the practical home/feed at `/app`; redirect `/app/square` to `/app`; move the summary/dashboard route to `/app/today`. Scope all Today widgets to the current KST day (`00:00-23:59`): people who spoke up, voices, Seoul regional congestion, top voices, world press, and verified posts. Where cumulative context is useful, display `today/total` with the total smaller and softer, similar to older blog visit-counter patterns.
   **Must NOT do**: Do not perform hosted DNS, Vercel, Cloudflare, OAuth callback, or production domain mutations in this task. Do not label Seoul congestion as rally headcount. Do not remove cumulative counter availability; show it only as secondary context on Today.
