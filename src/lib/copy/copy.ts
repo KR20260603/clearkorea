@@ -1,5 +1,10 @@
 export const dockLabels = ["Home", "Rallies", "Square", "Live", "News"] as const;
 
+export const counterLabels = {
+  participants: "People who spoke up",
+  voices: "Voices",
+} as const;
+
 type BilingualCopy = {
   readonly en: string;
   readonly ko: string;

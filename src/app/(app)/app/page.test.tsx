@@ -1,37 +1,56 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import AppHomePage from "./page";
 
-describe("AppHomePage", () => {
-  it("renders the app placeholder with landing-aligned shell and required dock labels", () => {
+describe("AppHomePage dashboard", () => {
+  it("pins participant and voice counters at the top", () => {
     render(<AppHomePage />);
 
     expect(screen.getByRole("main")).toHaveClass("h-svh");
-    expect(screen.getByTestId("app-hero-background")).toHaveClass(
-      "bg-[image:url('/tile.png')]",
-    );
-    expect(screen.getByTestId("app-hero-background")).toHaveClass("opacity-95");
-    expect(
-      screen.getByRole("heading", { name: /ClearKorea app shell/ }),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Development preview")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", {
-        name: "같은 구조, 같은 배경, 같은 기록의 톤으로 앱 안까지 이어진다.",
-      }),
-    ).toBeInTheDocument();
 
-    const dockLabels = screen
+    const participants = screen.getByTestId("counter-participants");
+    const voices = screen.getByTestId("counter-voices");
+    expect(within(participants).getByText("People who spoke up")).toBeInTheDocument();
+    expect(within(voices).getByText("Voices")).toBeInTheDocument();
+    expect(within(participants).getByText("0")).toBeInTheDocument();
+    expect(within(voices).getByText("0")).toBeInTheDocument();
+  });
+
+  it("labels Seoul data as regional congestion, never rally headcount", () => {
+    render(<AppHomePage />);
+
+    expect(
+      screen.getByText("Regional real-time congestion"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/regional real-time congestion for nearby public areas/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/rally headcount/i)).toBeNull();
+  });
+
+  it("keeps the five-tab dock visible with exact English labels", () => {
+    render(<AppHomePage />);
+
+    const dock = screen.getByRole("navigation", { name: "Primary app sections" });
+    expect(dock.querySelectorAll("svg")).toHaveLength(5);
+
+    const labels = within(dock)
       .getAllByText(/^(Home|Rallies|Square|Live|News)$/)
       .map((element) => element.textContent);
+    expect(labels).toEqual(["Home", "Rallies", "Square", "Live", "News"]);
 
-    expect(dockLabels).toContain("Home");
-    expect(dockLabels).toContain("Rallies");
-    expect(dockLabels).toContain("Square");
-    expect(dockLabels).toContain("Live");
-    expect(dockLabels).toContain("News");
-    expect(
-      screen.getByRole("navigation", { name: "Primary app sections" }).querySelectorAll("svg"),
-    ).toHaveLength(5);
+    expect(within(dock).getByRole("link", { name: /Home/ })).toHaveAttribute(
+      "href",
+      "/app",
+    );
+  });
+
+  it("offers a login entry point that leads to the auth choices", () => {
+    render(<AppHomePage />);
+
+    expect(screen.getByRole("link", { name: /Log in/ })).toHaveAttribute(
+      "href",
+      "/auth/start",
+    );
   });
 });
