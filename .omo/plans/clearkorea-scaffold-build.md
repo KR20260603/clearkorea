@@ -729,7 +729,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(stations): port affected polling board` | Files: `src/app/(app)/stations/**`, `src/data/**`, Cron/API routes, tests
 
-- [ ] 11. Build Admin Queues, Applications, Settings, And Audit Logs
+- [x] 11. Build Admin Queues, Applications, Settings, And Audit Logs
 
   **What to do**: Implement `/admin` client-only noindex route with role gating, tip approval/rejection, admin application approval/rejection/demotion, moderation queues, super-admin-only auto-hide settings, audit log writes, and profile menu entry points. Admin identity checks must use roles produced by the Kakao/Naver provider-ID bootstrap or explicit super-admin approvals from Task 5.
   **Must NOT do**: Do not expose admin UI to guests/users; do not let regular admins change auto-hide thresholds.
@@ -743,10 +743,10 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - use for dense utilitarian admin UI, queue scanning, form hierarchy, and destructive-action clarity.
 
   **Acceptance Criteria**:
-  - [ ] `/admin` has noindex metadata and denies non-admin users.
-  - [ ] Super admin can approve/demote admins and adjust moderation settings.
-  - [ ] Regular admin can process tips and moderation queues but cannot change super settings.
-  - [ ] Every approval/rejection/demotion/settings change writes `audit_logs`.
+  - [x] `/admin` has noindex metadata and denies non-admin users.
+  - [x] Super admin can approve/demote admins and adjust moderation settings.
+  - [x] Regular admin can process tips and moderation queues but cannot change super settings.
+  - [x] Every approval/rejection/demotion/settings change writes `audit_logs`.
 
   **QA Scenarios**:
   ```
