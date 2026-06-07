@@ -616,7 +616,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(app): make Square home and add Today summary` | Files: `src/app/(app)/app/**`, `src/components/app/**`, `src/lib/counters/**`, tests, plan
 
-- [ ] 8. Build Rallies, Seoul Congestion Proxy, Map, And Support Guide
+- [x] 8. Build Rallies, Seoul Congestion Proxy, Map, And Support Guide
 
   **What to do**: Implement rallies list/map, status, support guide, admin-managed rally data, Seoul place-code mapping, server proxy with 1-5 minute cache for Seoul real-time city data, and Seoul-only congestion disclaimer. Use admin/crowdsourced fallback for non-Seoul.
   **Must NOT do**: Do not expose Seoul API key client-side; do not display congestion as rally attendance.
@@ -629,10 +629,10 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - mandatory for map/list/support-guide layout, congestion visual hierarchy, and disclaimer placement.
 
   **Acceptance Criteria**:
-  - [ ] `/app/rallies` lists ongoing/upcoming rallies with map markers.
-  - [ ] Support guide explains delivery/support actions safely.
-  - [ ] Seoul congestion API route caches and labels data correctly.
-  - [ ] Non-Seoul rallies render without failing when no API mapping exists.
+  - [x] `/app/rallies` lists ongoing/upcoming rallies with map markers.
+  - [x] Support guide explains delivery/support actions safely.
+  - [x] Seoul congestion API route caches and labels data correctly.
+  - [x] Non-Seoul rallies render without failing when no API mapping exists.
 
   **QA Scenarios**:
   ```

@@ -1,0 +1,66 @@
+import type { RallyListItem } from "@/lib/rallies/rallies";
+
+// v1 seed data. Shape matches the public.rallies table so it can move to the DB
+// without changing the app contract. Times are illustrative civic fixtures.
+export const RALLY_SEED: readonly RallyListItem[] = [
+  {
+    id: 1,
+    title: "Olympic Park lawful gathering",
+    location: "Olympic Park, Songpa-gu, Seoul",
+    lat: 37.5219,
+    lng: 127.1217,
+    seoulPlaceCode: "olympic-park",
+    startAt: "2026-06-10T09:00:00.000Z",
+    status: "active",
+  },
+  {
+    id: 2,
+    title: "Jamsil solidarity stand",
+    location: "Jamsil Sports Complex, Songpa-gu, Seoul",
+    lat: 37.5159,
+    lng: 127.0731,
+    seoulPlaceCode: "jamsil",
+    startAt: "2026-06-12T09:00:00.000Z",
+    status: "planned",
+  },
+  {
+    id: 3,
+    title: "Gwanghwamun evening vigil",
+    location: "Gwanghwamun Square, Jongno-gu, Seoul",
+    lat: 37.5759,
+    lng: 126.9769,
+    seoulPlaceCode: "gwanghwamun",
+    startAt: "2026-06-13T10:30:00.000Z",
+    status: "planned",
+  },
+  {
+    id: 4,
+    title: "Seoul Plaza transparency rally",
+    location: "Seoul Plaza, Jung-gu, Seoul",
+    lat: 37.5663,
+    lng: 126.9779,
+    seoulPlaceCode: "seoul-plaza",
+    startAt: "2026-06-14T08:00:00.000Z",
+    status: "planned",
+  },
+  {
+    id: 5,
+    title: "Incheon Yeonsu support meet",
+    location: "Yeonsu-gu, Incheon",
+    lat: 37.4101,
+    lng: 126.6781,
+    seoulPlaceCode: null,
+    startAt: "2026-06-15T09:30:00.000Z",
+    status: "planned",
+  },
+  {
+    id: 6,
+    title: "Busan citizens' assembly",
+    location: "Seomyeon, Busan",
+    lat: 35.1577,
+    lng: 129.0594,
+    seoulPlaceCode: null,
+    startAt: "2026-06-16T09:00:00.000Z",
+    status: "planned",
+  },
+];
