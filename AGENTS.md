@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
 **Generated:** 2026-06-07
-**Commit:** `9237323`
+**Commit:** `db8bf16`
 **Branch:** `main`
 
 ## OVERVIEW
@@ -40,10 +40,15 @@ clearkorea/
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Active implementation plan | `.omo/plans/clearkorea-scaffold-build.md` | Wave 4 is complete (Tasks 5-9); next wave is Wave 5 (Tasks 10-15): affected stations, admin queues, edge cache/abuse guardrails, moderation AI, PostHog observability, deployment/CI. |
-| App feature pages | `src/app/(app)/app/` | `/app` Square feed, `/app/today` KST summary, `/app/rallies`, `/app/live`, `/app/news`. Each page is a thin server shell composing `src/components/app/*` and `src/data/*`. |
-| Deferred-integration API routes | `src/app/api/` | `counters`, `voices`, `tips` (Kakao/Naver auth gate then 202/503 deferred insert), `link-preview` (SSRF-safe metadata), `congestion` (server-only Seoul key proxy). |
+| Active implementation plan | `.omo/plans/clearkorea-scaffold-build.md` | Wave 5 is complete (Tasks 10-15); only Wave 6 (Task 16) full-surface verification remains. |
+| App feature pages | `src/app/(app)/app/` | `/app` Square feed, `/app/today` KST summary, `/app/rallies`, `/app/live`, `/app/news`, `/app/stations` (ballot-box board). Each page is a thin server shell composing `src/components/app/*` and `src/data/*`. |
+| Deferred-integration API routes | `src/app/api/` | `counters`, `voices`, `tips` (auth gate -> rate-limit -> 202/503), `link-preview` (SSRF-safe metadata), `congestion` (server-only Seoul key proxy), `stations/refresh` (review-only Cron draft), `admin/*` (role-gated), `moderation/hot-check` (admin-gated). |
+| Admin and roles | `src/app/(admin)/admin/`, `src/lib/admin/`, `src/components/admin/` | noindex role-gated `/admin`; super-only settings/applications, admin tips/moderation; audit entries on every action. |
+| Abuse guardrails | `src/lib/security/`, `docs/setup/edge-and-abuse-guardrails.md` | In-memory rate limit (no Redis) + Turnstile abstraction wired into write routes after the auth gate; Cloudflare/Turnstile checklist. |
+| Moderation and agents | `src/lib/moderation/`, `src/lib/agents/` | Hot-entry-once AI (ai_checked) with heuristic/OpenAI classifier, soft-hide + review queues, trust, conservative auto-hide; triage agents only recommend. |
+| Observability | `src/lib/posthog/`, `src/components/posthog-provider.tsx`, `docs/setup/observability-posthog.md` | Env-gated PostHog (no-op without key), replay masking via `data-ph-mask`, feature flags, PII-safe error capture; no Sentry. |
 | Feed ingestion logic | `src/lib/news/`, `config/feeds.json` | `keyword-filter.ts` (Korea-AND-topic), `feed-item.ts` (tracking-param dedupe, metadata-only). Weekly liveness check in `.github/workflows/feeds.yml`. |
+| CI and deployment | `.github/workflows/ci.yml`, `docs/setup/deployment.md` | CI runs lint/typecheck/test/build/feed-check; deployment/external-project setup stays a deferred, approval-gated runbook. |
 | Product scope and architecture | `PLAN.md` | Source of truth for v1 scope, stack, safety, data model, and Kakao/Naver-only production auth policy. |
 | App shell and SEO routes | `src/app/` | Next.js App Router route groups `(marketing)`, `(app)`, `(admin)`, metadata, robots, sitemap, manifest, tests. |
 | Shared visual shell | `src/app/shell-frame.tsx` | Landing and app header/logo alignment lives here; avoid duplicating shell header markup in route pages. |
@@ -60,6 +65,7 @@ clearkorea/
 - The Next.js scaffold exists with `package.json`, `pnpm-lock.yaml`, `src/app`, TypeScript, Tailwind, ESLint, Vitest, and commitlint.
 - Wave 3 is complete: Task 3 added the local Supabase schema/RLS/types baseline; Task 4 added copy, safety, URL-validation, nickname, and env-name contracts.
 - Wave 4 is complete (Tasks 5-9): Kakao/Naver auth launch gate + role bootstrap + nicknames (Task 5); five-tab app shell + Home/Today dashboard + counters (Task 6); Square voices/hot-sorting + Square-as-home + Today KST summary (Tasks 7, 7A); external first-URL embed previews with SSRF guard and no file upload (Task 7B); Rallies + map + server-only Seoul congestion proxy + support guide (Task 8); Live streams + News tabs + Report-a-post + metadata-only feed ingestion + weekly feed Action (Task 9).
+- Wave 5 is complete (Tasks 10-15): affected-stations board ported to `/app/stations` with review-only Cron draft (Task 10); role-gated noindex `/admin` queues + super-only settings + audit entries (Task 11); in-memory rate limit (no Redis) + Turnstile abstraction wired after the auth gate + Cloudflare checklist (Task 12); hot-entry-once AI moderation + soft-hide/review queues + trust + conservative auto-hide + recommend-only agents (Task 13); env-gated PostHog with replay masking + feature flags + PII-safe error capture, no Sentry (Task 14); CI workflow + deployment runbook + AGPL footer/metadata (Task 15). Only Wave 6 (Task 16) remains.
 - No hosted Supabase mutation has occurred. Write paths use a deferred pattern: API routes run the Kakao/Naver auth gate, then return `202 accepted`/`503 unavailable` until the hosted DB is wired. Treat hosted DDL/policy changes as critical service integration unless the user explicitly approves them.
 - `config/feeds.json` currently has 2 pre-existing dead required feeds (`cbc-world`, `kyodo-en`) from upstream RSS outages; the Google News catch-all backbone is live. This is unrelated to app code; a maintainer should refresh URLs or set `checked:false` in a dedicated feeds change.
 - `PLAN.md` remains the v1 production source of truth; use `.omo/plans/clearkorea-scaffold-build.md` for the active plan-driven build sequence.
@@ -92,6 +98,11 @@ clearkorea/
 - Foreign-press ingestion stores metadata only (title, source, URL, thumbnail, publish date, language); never article bodies. Filter with the multilingual Korea-AND-topic keyword filter, then dedupe by tracking-param-stripped URL.
 - The Seoul congestion proxy (`/api/congestion`) is server-only; keep `SEOUL_CITYDATA_API_KEY` out of client code and label output as regional real-time congestion, not rally headcount.
 - New app pages are thin server shells under `src/app/(app)/app/*` that compose client components from `src/components/app/*` and typed seed fixtures from `src/data/*`; new domain logic gets a `src/lib/<domain>/` module with co-located TDD tests.
+- `/admin` is client-only and `noindex`, gated by role. Tips and moderation queues need `admin`; admin-application review and super settings (auto-hide on/off + threshold) need `super`. Every approval/rejection/demotion/settings change builds an `audit_logs` entry. Keep auto-hide conservative (high minimum threshold) so a brigade cannot mass-hide lawful posts.
+- Write/report routes apply guards after the auth gate in order: reject production guests (`401`) before any rate-limit accounting, then the in-memory rate limiter (`429` + `Retry-After`, no Redis), then a Turnstile challenge near the limit when a secret is configured. Cloudflare edge rate limiting is the distributed defense.
+- AI moderation runs at most once per voice on hot-feed entry (`ai_checked`); the classifier is abstracted (heuristic default, deferred OpenAI adapter) and never the final authority. Operational triage agents only recommend and always require human review.
+- Observability is PostHog only (no Sentry). The provider is env-gated and a no-op without `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST`; session replay masks all inputs and `data-ph-mask` surfaces (Speak up composer, voice body); error capture records message + context only, never raw bodies or PII.
+- Hosted integrations (Vercel, Cloudflare, Supabase, PostHog, Turnstile, Seoul/OpenAI keys) stay deferred behind env names + setup guides under `docs/setup/`; creating projects or changing DNS/billing/credentials requires explicit user approval.
 
 ## PLANNING AND EXECUTION PHILOSOPHY
 
