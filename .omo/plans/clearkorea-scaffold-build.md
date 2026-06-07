@@ -844,7 +844,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(moderation): add AI-assisted review queues` | Files: moderation routes/jobs/admin UI/tests
 
-- [ ] 14. Wire PostHog, Feature Flags, Error Tracking, Replay Masking, And Uptime
+- [x] 14. Wire PostHog, Feature Flags, Error Tracking, Replay Masking, And Uptime
 
   **What to do**: Create PostHog project externally during execution, add SDK, analytics events, feature flags for hot-score weights/moderation thresholds/kill switches, error tracking, session replay with input/body masking, survey hooks if needed, uptime monitor checklist, and spend cap checklist for Vercel/Supabase.
   **Must NOT do**: Do not add Sentry; do not replay sensitive body text or PII.
@@ -857,11 +857,11 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - use when replay masking, error states, flag-controlled variants, or survey surfaces affect UI.
 
   **Acceptance Criteria**:
-  - [ ] PostHog provider loads only with configured public key/host.
-  - [ ] Session replay masks inputs and voice body text.
-  - [ ] Error tracking captures client/server errors through PostHog path.
-  - [ ] Feature flags can adjust hot-score weights and moderation thresholds.
-  - [ ] No Sentry package exists in `package.json`.
+  - [x] PostHog provider loads only with configured public key/host.
+  - [x] Session replay masks inputs and voice body text.
+  - [x] Error tracking captures client/server errors through PostHog path.
+  - [x] Feature flags can adjust hot-score weights and moderation thresholds.
+  - [x] No Sentry package exists in `package.json`.
 
   **QA Scenarios**:
   ```

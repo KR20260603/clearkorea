@@ -107,6 +107,7 @@ export function SpeakUpComposer() {
       </label>
       <textarea
         id="speak-up"
+        data-ph-mask
         value={content}
         onChange={(event) => setContent(event.target.value)}
         maxLength={MAX_LENGTH}

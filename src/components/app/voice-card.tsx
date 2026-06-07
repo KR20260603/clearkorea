@@ -95,7 +95,10 @@ export function VoiceCard({ voice }: { voice: VoiceCardData }) {
         </span>
       </header>
 
-      <p className="mt-2.5 whitespace-pre-wrap text-[clamp(0.82rem,1.95svh,1rem)] leading-[1.5] text-zinc-100">
+      <p
+        data-ph-mask
+        className="mt-2.5 whitespace-pre-wrap text-[clamp(0.82rem,1.95svh,1rem)] leading-[1.5] text-zinc-100"
+      >
         {voice.content}
       </p>
 
