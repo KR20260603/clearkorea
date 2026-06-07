@@ -83,6 +83,9 @@ export default function LandingPage() {
                   <GitHubMark />
                 </a>
               </div>
+              <p className="mt-[clamp(0.5rem,1.6svh,1rem)] text-[clamp(0.62rem,1.4svh,0.78rem)] text-zinc-500">
+                Open source · Licensed AGPL-3.0-only
+              </p>
             </div>
             <aside
               aria-label="ClearKorea declaration"

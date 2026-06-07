@@ -880,7 +880,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(observability): add PostHog flags and masking` | Files: `src/lib/posthog/**`, providers, tests, ops docs
 
-- [ ] 15. Configure Deployment, External Projects, CI, And Environment Hygiene
+- [x] 15. Configure Deployment, External Projects, CI, And Environment Hygiene
 
   **What to do**: Add Vercel project setup instructions/config, Cloudflare zone/DNS/WAF checklist, Supabase linked project instructions, env var templates without values, GitHub Actions for lint/typecheck/test/build/feed check, Codex Browser/browser-use manual QA instructions, deployment protection/noindex checks, spend caps, and AGPL/license metadata in package/footer.
   **Must NOT do**: Do not create or commit `.env`; do not commit Vercel/Supabase tokens.
@@ -893,10 +893,10 @@ Wave 6: Task 16
   - Pattern: `CONTRIBUTING.md` - security and checks.
 
   **Acceptance Criteria**:
-  - [ ] `.env.example` lists variable names only, including `SUPER_ADMIN_PROVIDER_IDS` and `ADMIN_PROVIDER_IDS` or the final names chosen in Task 2B.
-  - [ ] CI runs lint, typecheck, unit tests, build, and feed check; browser QA remains Codex Browser/browser-use runbook evidence.
-  - [ ] Package metadata/license is `AGPL-3.0-only`.
-  - [ ] Deployment docs include Vercel, Cloudflare, Supabase, PostHog, Turnstile, uptime, and spend caps.
+  - [x] `.env.example` lists variable names only, including `SUPER_ADMIN_PROVIDER_IDS` and `ADMIN_PROVIDER_IDS` or the final names chosen in Task 2B.
+  - [x] CI runs lint, typecheck, unit tests, build, and feed check; browser QA remains Codex Browser/browser-use runbook evidence.
+  - [x] Package metadata/license is `AGPL-3.0-only`.
+  - [x] Deployment docs include Vercel, Cloudflare, Supabase, PostHog, Turnstile, uptime, and spend caps.
 
   **QA Scenarios**:
   ```
