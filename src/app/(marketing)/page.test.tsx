@@ -31,7 +31,7 @@ describe("LandingPage", () => {
     expect(screen.getByTestId("landing-candle-field")).not.toHaveClass("brightness-75");
 
     const enterLink = screen.getByRole("link", { name: "Enter" });
-    expect(enterLink).toHaveAttribute("href", "/app");
+    expect(enterLink).toHaveAttribute("href", "/auth/start");
     expect(enterLink).toHaveClass("rounded-full");
     expect(enterLink).toHaveClass("bg-gradient-to-r");
     expect(enterLink.querySelector("span")).toHaveClass("rounded-full");

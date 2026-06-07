@@ -122,7 +122,8 @@ Wave 6: Task 16
 - Task 3 completed in commit `6616050 feat(db): add Supabase schema and policies`; it added local Supabase config, migration, RLS/storage policies, seed data, schema checks, project constants, and generated database types without mutating the hosted Supabase project.
 - Task 4 completed in commit `2cdc860 feat(copy): add safety and UI text contracts`; it added civic copy, safety text, URL validation, nickname contracts, env-name contract tests, and the official `.env.example` variable names.
 - Verified after Wave 3: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `node scripts/check-feeds.mjs config/feeds.json`, and `node scripts/check-supabase-schema.mjs supabase/migrations/20260606030000_initial_schema.sql supabase/seed.sql`.
-- **Next wave to execute after this init-deep task-boundary commit: Wave 4. Start with Task 5** to build Kakao/Naver auth, launch gate, role bootstrap, and production-safe nickname behavior.
+- Task 5 completed (Wave 4): Kakao/Naver-only launch gate, provider registry (no Google), launch-mode SSOT with non-production-only guest bypass, Supabase SSR clients, Naver custom-OAuth bridge, auth routes + `/auth/start` choice UI, `/app` gate middleware, immutable Korean nickname generator, provider-qualified role bootstrap/sync, local `sync_user_role` migration, admin-application validator, and `docs/setup/auth-setup-guide.md` for deferred hosted wiring. Verified: `pnpm lint`, `pnpm typecheck`, `pnpm test` (93), `pnpm build`, and production browser QA of `/auth/start` (Kakao+Naver only, no Google/guest, 320x480). No hosted Supabase mutation performed.
+- **Next wave to execute: remainder of Wave 4 — Tasks 6, 7, 8, 9** (app shell/counters, Square voices, Rallies/congestion, Live/News/feeds).
 - Do not wire critical hosted Supabase/Vercel/Cloudflare/PostHog changes without explicit user approval. If a service integration is not critical to the current behavior, keep it abstracted and provide the final setup guide instead.
 
 ### Dependency Matrix
@@ -396,7 +397,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(copy): add safety and UI text contracts` | Files: `src/lib/copy/**`, `src/lib/validation/**`, tests
 
-- [ ] 5. Build Kakao/Naver Auth, Launch Gate, Role Bootstrap, And Nicknames
+- [x] 5. Build Kakao/Naver Auth, Launch Gate, Role Bootstrap, And Nicknames
 
   **What to do**: Implement production auth around Kakao and Naver only. Use Supabase SSR clients, session cookies, built-in Kakao OAuth, and a Naver custom OAuth/OIDC bridge unless later official Supabase Naver support is verified from primary docs. Add a launch-mode gate that denies guest participation in production, plus a development/test guest bypass behind an explicit non-production env flag for multi-account QA. Generate immutable nicknames for linked users and dev/test guest fixtures. Bootstrap roles from env-only provider-qualified Kakao/Naver identity IDs or explicit super-admin approval, and demote users on login when those identifiers are removed.
   **Must NOT do**: Do not implement Google OAuth; do not render Google as a login choice; do not use email-only allowlists for admin/super-admin; do not copy allowlist values into source/tests; do not allow production guest login, posting, or reporting.
@@ -410,13 +411,13 @@ Wave 6: Task 16
   - External: Supabase docs - Kakao built-in OAuth provider; Naver planned as custom OAuth/OIDC if no official provider support is verified.
 
   **Acceptance Criteria**:
-  - [ ] In production/launch mode, `/` Enter leads to Kakao and Naver login choices only.
-  - [ ] Google OAuth option is absent from rendered UI, provider policy tests, and app auth configuration.
-  - [ ] Kakao/Naver linked user can enter `/app` and receives immutable nickname format Korean 6 syllables + 4 digits.
-  - [ ] Development/test guest bypass works only when explicit non-production flag is enabled and is rejected in production/launch mode.
-  - [ ] Kakao/Naver OAuth user can apply for admin.
-  - [ ] Provider-qualified Kakao/Naver identity allowlist promotes admin/super-admin and demotes on next login when removed.
-  - [ ] Email-only matches never promote admin/super-admin.
+  - [x] In production/launch mode, `/` Enter leads to Kakao and Naver login choices only.
+  - [x] Google OAuth option is absent from rendered UI, provider policy tests, and app auth configuration.
+  - [x] Kakao/Naver linked user can enter `/app` and receives immutable nickname format Korean 6 syllables + 4 digits.
+  - [x] Development/test guest bypass works only when explicit non-production flag is enabled and is rejected in production/launch mode.
+  - [x] Kakao/Naver OAuth user can apply for admin.
+  - [x] Provider-qualified Kakao/Naver identity allowlist promotes admin/super-admin and demotes on next login when removed.
+  - [x] Email-only matches never promote admin/super-admin.
 
   **QA Scenarios**:
   ```

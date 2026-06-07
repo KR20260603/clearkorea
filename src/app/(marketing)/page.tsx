@@ -67,7 +67,7 @@ export default function LandingPage() {
               </div>
               <div className="mt-[clamp(0.75rem,2.4svh,1.75rem)] flex flex-wrap items-center gap-[clamp(0.75rem,3vw,1.25rem)]">
                 <a
-                  href="/app"
+                  href="/auth/start"
                   className="inline-flex min-h-[clamp(2.375rem,6svh,3rem)] min-w-[clamp(10.5rem,48vw,13.5rem)] rounded-full bg-gradient-to-r from-civic-red via-white to-civic-blue p-px text-[clamp(0.875rem,2.2svh,1.125rem)] font-bold text-white transition hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                 >
                   <span className="inline-flex min-h-[calc(100%-2px)] w-full items-center justify-center gap-2 rounded-full bg-civic-bg px-8">

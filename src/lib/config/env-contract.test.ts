@@ -13,4 +13,11 @@ describe("environment variable naming contract", () => {
     expect(example).toContain("ADMIN_PROVIDER_IDS=");
     expect(example).not.toMatch(/SUPABASE_DB_PW|SUPER_ADMIN_EMAILS|ADMIN_EMAILS/);
   });
+
+  it("documents the server-only Supabase service role key for role bootstrap", () => {
+    const example = readFileSync(join(process.cwd(), ".env.example"), "utf8");
+
+    expect(example).toContain("SUPABASE_SERVICE_ROLE_KEY=");
+    expect(example).not.toMatch(/NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY/);
+  });
 });

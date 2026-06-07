@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   nicknamePattern,
-  sampleNicknameWordBuckets,
+  nicknameWordBuckets,
+  syllableSumCombinations,
   validateGeneratedNickname,
+  type SyllableLength,
 } from "./nickname-contract";
 
 describe("nickname contract", () => {
@@ -12,9 +14,23 @@ describe("nickname contract", () => {
     expect(validateGeneratedNickname("change-me-1305")).toBe(false);
   });
 
-  it("keeps sample safe word buckets available until Task 5 expands vocabulary", () => {
-    expect(sampleNicknameWordBuckets[2].some((word) => word.length === 2)).toBe(true);
-    expect(sampleNicknameWordBuckets[4].some((word) => word.length === 4)).toBe(true);
-    expect(sampleNicknameWordBuckets[3].length).toBeGreaterThanOrEqual(2);
+  it("ships an expanded curated word pool keyed by exact syllable length", () => {
+    const lengths: SyllableLength[] = [1, 2, 3, 4, 5];
+
+    for (const length of lengths) {
+      const bucket = nicknameWordBuckets[length];
+      expect(bucket.length).toBeGreaterThanOrEqual(8);
+
+      for (const word of bucket) {
+        expect(word).toMatch(/^[가-힣]+$/);
+        expect([...word]).toHaveLength(length);
+      }
+    }
+  });
+
+  it("only allows two-word combinations that sum to six syllables", () => {
+    for (const [first, second] of syllableSumCombinations) {
+      expect(first + second).toBe(6);
+    }
   });
 });
