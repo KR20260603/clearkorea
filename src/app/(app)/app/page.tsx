@@ -29,6 +29,7 @@ export default function SquarePage() {
           </Link>
         }
       >
+        <h1 className="sr-only">Square</h1>
         <SpeakUpComposer />
 
         <div
