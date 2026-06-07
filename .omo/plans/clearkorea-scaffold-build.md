@@ -651,7 +651,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(rallies): add rally map and congestion proxy` | Files: `src/app/(app)/rallies/**`, API routes, tests
 
-- [ ] 9. Build Live Streams, News Tabs, Tips, And Feed Ingestion
+- [x] 9. Build Live Streams, News Tabs, Tips, And Feed Ingestion
 
   **What to do**: Implement Live YouTube grid/replays, News tabs All/Verified/Public/World press, verified badges, Report a post modal, SNS URL validation, admin tip queue integration, RSS/Google News ingestion Cron, keyword filtering, URL dedupe, thumbnail metadata parsing, and GitHub Action for existing feed checker.
   **Must NOT do**: Do not collect article bodies; do not add npm dependencies to `scripts/check-feeds.mjs`.
@@ -666,11 +666,11 @@ Wave 6: Task 16
   - Skill: `$omo:frontend-ui-ux` - mandatory for stream grid, news tab density, verified badges, thumbnails, and report modal design.
 
   **Acceptance Criteria**:
-  - [ ] `/app/live` renders verified YouTube embeds and replay state.
-  - [ ] `/app/news` renders All/Verified/Public/World press tabs.
-  - [ ] Report modal accepts allowed SNS links and rejects disallowed domains.
-  - [ ] Feed ingestion stores filtered metadata only: title, source, URL, thumbnail, publish date, language.
-  - [ ] Weekly GitHub Action runs `node scripts/check-feeds.mjs config/feeds.json`.
+  - [x] `/app/live` renders verified YouTube embeds and replay state.
+  - [x] `/app/news` renders All/Verified/Public/World press tabs.
+  - [x] Report modal accepts allowed SNS links and rejects disallowed domains.
+  - [x] Feed ingestion stores filtered metadata only: title, source, URL, thumbnail, publish date, language.
+  - [x] Weekly GitHub Action runs `node scripts/check-feeds.mjs config/feeds.json`.
 
   **QA Scenarios**:
   ```

@@ -75,13 +75,16 @@ describe("resolveSeoulCongestion", () => {
   });
 
   it("requests the citydata endpoint using the configured key server-side", async () => {
-    const fetchImpl = vi.fn(async (_url: string) => citydataResponse("여유"));
+    let calledUrl = "";
+    const fetchImpl = vi.fn(async (url: string) => {
+      calledUrl = url;
+      return citydataResponse("여유");
+    });
     await resolveSeoulCongestion({
       placeCode: "olympic-park",
       env: { SEOUL_CITYDATA_API_KEY: "key123" },
       fetchImpl,
     });
-    const calledUrl = fetchImpl.mock.calls[0]?.[0] ?? "";
     expect(calledUrl).toContain("citydata_ppltn");
     expect(calledUrl).toContain("key123");
     expect(calledUrl).toContain(encodeURIComponent("올림픽공원"));
