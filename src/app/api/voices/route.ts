@@ -2,11 +2,16 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { authorizeVoiceWrite } from "@/lib/voices/voice-authorization";
+import { createRateLimitStore } from "@/lib/security/rate-limit";
+import { guardWrite } from "@/lib/security/write-guard";
+import { TURNSTILE_SECRET_ENV } from "@/lib/security/turnstile";
 import type { AppSessionIdentity } from "@/lib/auth/app-entry";
 
 type AuthClient = {
   auth: { getUser(): PromiseLike<{ data: { user: { id: string } | null } }> };
 };
+
+const voiceWriteStore = createRateLimitStore();
 
 async function readSession(
   client: AuthClient | null,
@@ -25,9 +30,29 @@ export async function POST(request: Request) {
     setAll: () => {},
   });
 
-  const authorization = authorizeVoiceWrite({ session: await readSession(client) });
+  const session = await readSession(client);
+  const authorization = authorizeVoiceWrite({ session });
   if (!authorization.allowed) {
     return NextResponse.json({ error: authorization.reason }, { status: 401 });
+  }
+
+  const guard = await guardWrite({
+    store: voiceWriteStore,
+    key: `voice:${session?.authUserId ?? "dev-guest"}`,
+    turnstileToken: request.headers.get("cf-turnstile-response"),
+    turnstileSecret: process.env[TURNSTILE_SECRET_ENV],
+  });
+  if (guard.kind === "rate-limited") {
+    return NextResponse.json(
+      { error: "You are posting too fast. Try again shortly." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(guard.retryAfterMs / 1000)) } },
+    );
+  }
+  if (guard.kind === "challenge-failed") {
+    return NextResponse.json(
+      { error: "Please complete the verification challenge." },
+      { status: 403 },
+    );
   }
 
   const body = (await request.json().catch(() => null)) as { content?: unknown } | null;

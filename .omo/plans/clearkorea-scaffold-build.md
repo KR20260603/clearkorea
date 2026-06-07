@@ -765,7 +765,7 @@ Wave 6: Task 16
 
   **Commit**: YES | Message: `feat(admin): add queues and role-gated settings` | Files: `src/app/(admin)/**`, `src/lib/admin/**`, tests
 
-- [ ] 12. Add Edge Caching, Rate Limits, Turnstile, And Abuse Guardrails
+- [x] 12. Add Edge Caching, Rate Limits, Turnstile, And Abuse Guardrails
 
   **What to do**: Implement app-level rate limits for authenticated Kakao/Naver writing/reporting, immediate launch-mode rejection for anonymous/guest production writes, optional development/test guest limits behind the same non-production flag as Task 5, Turnstile challenge on suspicious write paths, cache headers/ISR for public read-heavy endpoints, Cloudflare deployment checklist, WAF/bot rules checklist, and no-Redis baseline documentation.
   **Must NOT do**: Do not add Redis; do not leak IP/device identifiers into public UI.
@@ -778,12 +778,12 @@ Wave 6: Task 16
   - Pattern: `AGENTS.md` - no Redis baseline.
 
   **Acceptance Criteria**:
-  - [ ] Public read endpoints use cache headers or ISR as appropriate.
-  - [ ] Production anonymous/guest write/report endpoints are rejected before rate-limit accounting.
-  - [ ] Authenticated Kakao/Naver write/report endpoints enforce rate limits.
-  - [ ] Development/test guest write/report limits work only when non-production guest bypass is enabled.
-  - [ ] Suspicious write flow requires Turnstile.
-  - [ ] Cloudflare setup checklist covers DNS/proxy/WAF/DDoS/bot/rate-limit settings.
+  - [x] Public read endpoints use cache headers or ISR as appropriate.
+  - [x] Production anonymous/guest write/report endpoints are rejected before rate-limit accounting.
+  - [x] Authenticated Kakao/Naver write/report endpoints enforce rate limits.
+  - [x] Development/test guest write/report limits work only when non-production guest bypass is enabled.
+  - [x] Suspicious write flow requires Turnstile.
+  - [x] Cloudflare setup checklist covers DNS/proxy/WAF/DDoS/bot/rate-limit settings.
 
   **QA Scenarios**:
   ```
