@@ -1,12 +1,14 @@
 {
   "meta": {
     "name": "ClearKorea 해외언론 피드 설정",
-    "updated": "2026-06-06",
+    "updated": "2026-06-07",
     "notes": [
-      "checked=true 는 2026-06-06 검색 결과에서 확인된 피드, checked=false 는 표준이지만 런타임 검증 권장.",
+      "checked=true 는 검색·런타임에서 확인된 피드, checked=false 는 표준이지만 런타임 검증 권장.",
       "Reuters/AP/AFP/Bloomberg/FT/WSJ 등은 공개 RSS가 제한·중단되어 googleNews 쿼리로 커버한다.",
       "googleNews 가 핵심 catch-all. outlets 직접 RSS는 신뢰 출처 우선 노출용.",
-      "수집 후 keywordFilter 를 반드시 적용해서 한국 선거 관련 항목만 통과시킬 것."
+      "수집 후 keywordFilter 를 반드시 적용해서 한국 선거 관련 항목만 통과시킬 것.",
+      "cbc-world: 피드 URL은 정상(브라우저 UA로 HTTP 200 + 유효 RSS)이지만 CBC CDN이 자동화 봇 User-Agent를 HTTP/2 reset 으로 차단해 check-feeds.mjs 로는 검증 불가 → checked=false 로 유지.",
+      "kyodo-en: 공개 RSS 가 중단(404)되어 검증된 라이브 일본 영문 통신사 피드인 Nikkei Asia 로 교체함."
     ]
   },
 
@@ -85,9 +87,9 @@
     { "id": "yahoo-world", "name": "Yahoo News (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://news.yahoo.com/rss/world", "site": "https://news.yahoo.com/world/", "checked": true },
     { "id": "abcnews-us-top", "name": "ABC News (US, Top Stories)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://abcnews.go.com/abcnews/topstories", "site": "https://abcnews.go.com/", "checked": false },
     { "id": "seattletimes-world", "name": "The Seattle Times (World)", "country": "US", "region": "Americas", "lang": "en", "rss": "https://www.seattletimes.com/nation-world/world/feed/", "site": "https://www.seattletimes.com/nation-world/world/", "checked": true },
-    { "id": "cbc-world", "name": "CBC News (World)", "country": "Canada", "region": "Americas", "lang": "en", "rss": "https://www.cbc.ca/webfeed/rss/rss-world", "site": "https://www.cbc.ca/news/world", "checked": true },
+    { "id": "cbc-world", "name": "CBC News (World)", "country": "Canada", "region": "Americas", "lang": "en", "rss": "https://www.cbc.ca/webfeed/rss/rss-world", "site": "https://www.cbc.ca/news/world", "checked": false },
 
-    { "id": "kyodo-en", "name": "Kyodo News (English)", "country": "Japan", "region": "Asia", "lang": "en", "rss": "https://english.kyodonews.net/rss/all.xml", "site": "https://english.kyodonews.net/", "checked": true },
+    { "id": "nikkei-asia", "name": "Nikkei Asia", "country": "Japan", "region": "Asia", "lang": "en", "rss": "https://asia.nikkei.com/rss/feed/nar", "site": "https://asia.nikkei.com/", "checked": true },
     { "id": "japantimes", "name": "The Japan Times", "country": "Japan", "region": "Asia", "lang": "en", "rss": "https://www.japantimes.co.jp/feed/", "site": "https://www.japantimes.co.jp/", "checked": true },
     { "id": "scmp", "name": "South China Morning Post", "country": "Hong Kong", "region": "Asia", "lang": "en", "rss": "https://www.scmp.com/rss/91/feed", "site": "https://www.scmp.com/", "checked": true },
     { "id": "thediplomat", "name": "The Diplomat", "country": "US/Asia", "region": "Asia", "lang": "en", "rss": "https://thediplomat.com/feed/", "site": "https://thediplomat.com/", "checked": false },
@@ -108,7 +110,7 @@
       "The Wall Street Journal", "Financial Times", "The Economist", "POLITICO", "The Atlantic",
       "The Globe and Mail", "CTV News", "Toronto Star",
       "Al Arabiya English", "TRT World", "The National (UAE)",
-      "Nikkei Asia", "Channel NewsAsia", "The Straits Times", "NHK World-Japan",
+      "Channel NewsAsia", "The Straits Times", "NHK World-Japan",
       "El País", "Corriere della Sera", "La Repubblica"
     ]
   }
