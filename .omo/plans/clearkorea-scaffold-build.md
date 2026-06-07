@@ -116,7 +116,7 @@ Wave 5: Tasks 10, 11, 12, 13, 14, 15
 Wave 6: Task 16
 
 ### Current Execution State
-- Completed through Wave 3.
+- Completed through Wave 4 (Tasks 1-9 including 2A/2B/7A/7B). Next wave is Wave 5 (Tasks 10-15).
 - Task 2A completed in commit `e0012fc feat(shell): add unified branded app shell`.
 - Task 2B completed in commit `89c8bcf docs(auth): sync Kakao Naver launch policy`.
 - Task 3 completed in commit `6616050 feat(db): add Supabase schema and policies`; it added local Supabase config, migration, RLS/storage policies, seed data, schema checks, project constants, and generated database types without mutating the hosted Supabase project.
@@ -126,7 +126,9 @@ Wave 6: Task 16
 - Task 6 completed in commit `1c255b4 feat(app): add dashboard shell and counters`; five-tab app shell, dock, pinned counters, cached counters API.
 - Task 7 + 7A completed in commit `04aba5e feat(square): add voices and today routing`; Square composer/feed contracts, hot-score sorting, unauthenticated write guard, Square-as-home routing, Today (KST) summary route, and `Today/Rallies/Square/Live/News` dock labels.
 - Task 7B completed (Wave 4): server-side first-URL metadata preview (`/api/link-preview`) with SSRF guard (rejects loopback/link-local/private/metadata hosts), HTML-only + timeout + size limits, OpenGraph/`<title>` extraction with safe-image filtering, composer draft preview (resolving/resolved/unsupported, no file upload), and large-thumbnail bookmark embed card on voices. Verified: `pnpm lint`, `pnpm typecheck`, `pnpm test` (140), `pnpm build`, real-browser composer preview QA, and API SSRF/og:image probes. No hosted Supabase mutation.
-- **Next wave to execute: remainder of Wave 4 — Tasks 8, 9** (Rallies/Seoul congestion proxy, Live/News/feed ingestion).
+- Task 8 completed in commit `57875c7 feat(rallies): add rally map and congestion proxy`; /app/rallies list+SVG map+support guide, server-only Seoul congestion proxy (cache, no key leak, regional-congestion label), unknown-place 404, deferred unavailable. Verified: lint/typecheck/test/build, browser QA incl 320x480, API probes.
+- Task 9 completed in commit `9237323 feat(news): add live streams and feed ingestion`; /app/live verified YouTube+replay grids, /app/news All/Verified/Public/World-press tabs, Kakao/Naver-gated tips API + SNS-whitelist Report modal, metadata-only multilingual feed ingestion (keyword AND filter, tracking-param dedupe), weekly feeds GitHub Action. Verified: lint/typecheck/test (172), build, browser QA. Pre-existing dead required feeds `cbc-world`/`kyodo-en` are upstream RSS outages (documented, not caused by this task).
+- **Next wave to execute: Wave 5 — Tasks 10, 11, 12, 13, 14, 15** (affected stations port, admin queues/settings/audit, edge cache/rate-limit/Turnstile guardrails, moderation AI + agents, PostHog observability, deployment/CI/env hygiene).
 - Do not wire critical hosted Supabase/Vercel/Cloudflare/PostHog changes without explicit user approval. If a service integration is not critical to the current behavior, keep it abstracted and provide the final setup guide instead.
 
 ### Dependency Matrix

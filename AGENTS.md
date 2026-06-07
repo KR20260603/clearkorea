@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
 **Generated:** 2026-06-07
-**Commit:** `2cdc860`
+**Commit:** `9237323`
 **Branch:** `main`
 
 ## OVERVIEW
@@ -20,8 +20,10 @@ clearkorea/
 |-- .env.example       # Public env-name contract; no secret values
 |-- public/            # SVG/PNG/JPG brand, PWA, OG, SNS, hero, tile assets
 |-- src/
-|   |-- app/           # Next.js App Router routes, metadata, tests, shell frame
-|   |-- lib/           # Copy, validation, nickname, config, Supabase contracts
+|   |-- app/           # Next.js App Router routes (marketing/app/admin), api routes, metadata, shell frame
+|   |-- components/    # Client/shared UI: app dock, composer, voice/embed cards, rallies map, stream grid, news tabs, report modal
+|   |-- data/          # v1 typed seed fixtures (rallies, streams, news) in DB-row shape
+|   |-- lib/           # Copy, validation, auth, nickname, supabase, counters, voices, link-preview, rallies, news, streams, tips
 |   `-- test/          # Vitest setup
 |-- supabase/          # Local Supabase config, migrations, seed data
 |-- config/
@@ -38,7 +40,10 @@ clearkorea/
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Active implementation plan | `.omo/plans/clearkorea-scaffold-build.md` | Wave 3 is complete; next wave starts with Task 5 Kakao/Naver auth, launch gate, role bootstrap, and nickname implementation. |
+| Active implementation plan | `.omo/plans/clearkorea-scaffold-build.md` | Wave 4 is complete (Tasks 5-9); next wave is Wave 5 (Tasks 10-15): affected stations, admin queues, edge cache/abuse guardrails, moderation AI, PostHog observability, deployment/CI. |
+| App feature pages | `src/app/(app)/app/` | `/app` Square feed, `/app/today` KST summary, `/app/rallies`, `/app/live`, `/app/news`. Each page is a thin server shell composing `src/components/app/*` and `src/data/*`. |
+| Deferred-integration API routes | `src/app/api/` | `counters`, `voices`, `tips` (Kakao/Naver auth gate then 202/503 deferred insert), `link-preview` (SSRF-safe metadata), `congestion` (server-only Seoul key proxy). |
+| Feed ingestion logic | `src/lib/news/`, `config/feeds.json` | `keyword-filter.ts` (Korea-AND-topic), `feed-item.ts` (tracking-param dedupe, metadata-only). Weekly liveness check in `.github/workflows/feeds.yml`. |
 | Product scope and architecture | `PLAN.md` | Source of truth for v1 scope, stack, safety, data model, and Kakao/Naver-only production auth policy. |
 | App shell and SEO routes | `src/app/` | Next.js App Router route groups `(marketing)`, `(app)`, `(admin)`, metadata, robots, sitemap, manifest, tests. |
 | Shared visual shell | `src/app/shell-frame.tsx` | Landing and app header/logo alignment lives here; avoid duplicating shell header markup in route pages. |
@@ -54,7 +59,9 @@ clearkorea/
 
 - The Next.js scaffold exists with `package.json`, `pnpm-lock.yaml`, `src/app`, TypeScript, Tailwind, ESLint, Vitest, and commitlint.
 - Wave 3 is complete: Task 3 added the local Supabase schema/RLS/types baseline; Task 4 added copy, safety, URL-validation, nickname, and env-name contracts.
-- Task 3 did not mutate hosted Supabase. Treat hosted DDL/policy changes as critical service integration unless the user explicitly approves them.
+- Wave 4 is complete (Tasks 5-9): Kakao/Naver auth launch gate + role bootstrap + nicknames (Task 5); five-tab app shell + Home/Today dashboard + counters (Task 6); Square voices/hot-sorting + Square-as-home + Today KST summary (Tasks 7, 7A); external first-URL embed previews with SSRF guard and no file upload (Task 7B); Rallies + map + server-only Seoul congestion proxy + support guide (Task 8); Live streams + News tabs + Report-a-post + metadata-only feed ingestion + weekly feed Action (Task 9).
+- No hosted Supabase mutation has occurred. Write paths use a deferred pattern: API routes run the Kakao/Naver auth gate, then return `202 accepted`/`503 unavailable` until the hosted DB is wired. Treat hosted DDL/policy changes as critical service integration unless the user explicitly approves them.
+- `config/feeds.json` currently has 2 pre-existing dead required feeds (`cbc-world`, `kyodo-en`) from upstream RSS outages; the Google News catch-all backbone is live. This is unrelated to app code; a maintainer should refresh URLs or set `checked:false` in a dedicated feeds change.
 - `PLAN.md` remains the v1 production source of truth; use `.omo/plans/clearkorea-scaffold-build.md` for the active plan-driven build sequence.
 - Current visual state: `/` uses `public/hero2.png`; `/app` keeps `public/tile.png`; both share `ShellFrame`; `/app` bottom dock has icon+label items and must remain fully visible at small viewport heights.
 - Keep pre-scaffold prototypes, scripts, and config outside `src/` unless a plan task explicitly ports them.
@@ -70,7 +77,7 @@ clearkorea/
 - Keep safety language explicit: no doxxing, no tracking specific individuals, no organizing unlawful acts, no private retaliation.
 - For Seoul crowd data, label it as regional real-time congestion, not rally headcount.
 - For affected polling stations, keep the disclaimer that the list summarizes confirmed administrative failures and does not itself prove election fraud.
-- UI labels in the planned app bottom dock are English-only: `Home`, `Rallies`, `Square`, `Live`, `News`.
+- UI labels in the app bottom dock are English-only and exactly: `Today`, `Rallies`, `Square`, `Live`, `News`. `/app` is the Square home; `/app/square` redirects to `/app`; the dashboard summary lives at `/app/today` scoped to the KST day.
 - Production participation policy is Kakao/Naver OAuth only. Public launch must not expose guest login/posting/reporting or Google OAuth.
 - Development/test guest bypass is allowed only behind explicit non-production configuration and must be impossible in production launch mode.
 - Google News RSS/feed ingestion is still allowed and must not be confused with Google OAuth login.
@@ -80,6 +87,11 @@ clearkorea/
 - Brand palette is dark civic-tech: `#0A0A0A`, white, Korean-flag red `#CD2E3A`, and Korean-flag blue `#0047A0`; use red/blue as accents.
 - Brand direction is SVG-first. Use `public/readme-banner.svg` and `public/pwa-icon.svg` as the clean vector style references.
 - Preserve generated asset names from `PLAN.md` and `IMAGE.md`: `pwa-icon.svg`, `pwa-icon.png`, `pwa-icon.jpg`, `hero.png`, `hero-mobile.png`, `splash.png`, `og.png`, `readme-banner.svg`, `square.png`, `ig-feed.png`, `ig-story.png`, `x-header.png`, `tile.png`.
+- Deferred-integration write pattern (established in Waves 4): production write/report API routes run the Kakao/Naver auth gate first (`401` when unlinked), validate input (`400`), then return `202 accepted` (or `503` when the Supabase client is unconfigured) instead of mutating the hosted DB. Keep this pattern until hosted writes are explicitly approved.
+- Square voice posting takes external public links only; there is no file/image upload. The first public URL in a body is previewed server-side via `/api/link-preview`, which uses an SSRF guard (rejects loopback/link-local/private/cloud-metadata hosts), HTML-only + timeout + size limits, and OpenGraph/`<title>` extraction. External thumbnails are referenced as remote media, never stored or proxied.
+- Foreign-press ingestion stores metadata only (title, source, URL, thumbnail, publish date, language); never article bodies. Filter with the multilingual Korea-AND-topic keyword filter, then dedupe by tracking-param-stripped URL.
+- The Seoul congestion proxy (`/api/congestion`) is server-only; keep `SEOUL_CITYDATA_API_KEY` out of client code and label output as regional real-time congestion, not rally headcount.
+- New app pages are thin server shells under `src/app/(app)/app/*` that compose client components from `src/components/app/*` and typed seed fixtures from `src/data/*`; new domain logic gets a `src/lib/<domain>/` module with co-located TDD tests.
 
 ## PLANNING AND EXECUTION PHILOSOPHY
 
