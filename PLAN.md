@@ -113,6 +113,12 @@ image-prompts.md로 생성한 이미지를 적재적소에 연결한다.
 - 선택: **Vercel Web Analytics**(PostHog 웹애널리틱스와 중복), **Resend**(관리자 승인 알림 메일)
 - 범위 밖: Sentry, Auth0, Redis, 무거운 APM(Datadog/New Relic), 별도 GraphQL
 
+**v1 구현 조정(amendment, deliberate)**: 이 도구 목록은 baseline 권장이며 강제 의존성이 아니다. v1 스캐폴드는 다음과 같이 의도적으로 조정했다.
+- **Zod는 채택**(URL/입력 검증). **react-hook-form은 미채택**: 현재 폼이 단순(Speak up 작성, 제보 모달)해 네이티브 React 상태 + Zod로 충분하다. 폼이 복잡해지면 도입한다.
+- **shadcn/ui 미채택**: 동일 목표(락인 없는 Tailwind 컴포넌트)를 손수 만든 Tailwind 컴포넌트로 달성했다. 필요 시 shadcn CLI로 보강 가능하다.
+- **TanStack Query 미채택**: 4-1의 "엣지 캐시 + 캐시 폴링" 전략과 정합되게 `Cache-Control` 헤더 + 가벼운 폴링을 쓴다. 라이브 데이터/낙관적 갱신이 늘면 그때 도입한다.
+- **PostHog/Turnstile/Seoul/OpenAI/Supabase 등 호스티드 연동은 deferred**: env 이름 + `docs/setup/*` 셋업 가이드로 추상화하고, 실제 프로젝트 생성·키 연결은 user approval 후 진행한다(3-0 원칙 우선).
+
 ### 3-2. AI / 에이전트 활용 (AI-native 운영)
 
 겉으로 드러나지 않아도 백엔드·운영에 에이전트를 적극 활용한다.

@@ -24,13 +24,13 @@ describe("SquarePage app entry", () => {
     );
   });
 
-  it("shows the empty square state until voices arrive", () => {
+  it("renders the seed voice feed with author nicknames resolved by join", () => {
     render(<SquarePage />);
 
-    const empty = screen.getByTestId("square-empty");
-    expect(
-      within(empty).getByText(/No public voices are visible yet/),
-    ).toBeInTheDocument();
+    const articles = screen.getAllByRole("article");
+    expect(articles.length).toBeGreaterThan(0);
+    expect(screen.queryByTestId("square-empty")).not.toBeInTheDocument();
+    expect(screen.getByText("무지개민들레4821")).toBeInTheDocument();
   });
 
   it("keeps Square active in the dock while Today has its own route", () => {

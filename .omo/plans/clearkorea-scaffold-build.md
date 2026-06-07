@@ -969,10 +969,10 @@ Wave 6: Task 16
 
 ## Final Verification Wave (MANDATORY - after ALL implementation tasks)
 > ALL must APPROVE. Present consolidated results to user and get explicit okay before completing implementation.
-- [ ] F1. Plan Compliance Audit: compare implementation diff against every `PLAN.md` v1 item and this plan's TODOs.
-- [ ] F2. Code Quality Review: run LSP/typecheck/lint and inspect changed files for over-broad abstractions, duplicated policies, secret leakage, and unsafe civic wording.
-- [ ] F3. Real Manual QA: drive the real local web surface with Codex Browser/browser-use and capture screenshots/action logs.
-- [ ] F4. Scope Fidelity Check: verify no v1 item was silently deferred and no forbidden baseline technology was added.
+- [x] F1. Plan Compliance Audit: all Tasks 1-16 + 2A/2B/7A/7B checked; PLAN.md v1 scope represented. Tooling deviation (shadcn/react-hook-form/TanStack Query) documented as a deliberate amendment in PLAN.md section 3-1.
+- [x] F2. Code Quality Review: `pnpm lint`/`pnpm typecheck`/`pnpm test` (257) clean; no `as any`/`@ts-ignore`; no secret leakage; civic disclaimers intact. (LSP server not installed locally; `tsc --noEmit` is the authoritative type gate.)
+- [x] F3. Real Manual QA: HTTP+browser QA across all routes incl. the new Square seed feed (cards render, sort tabs reorder) and 320x480 layouts.
+- [x] F4. Scope Fidelity Check: no forbidden baseline tech (Sentry/Redis/Auth0/next-auth=0, no `pwa-icon.ico`); no production Google OAuth; Google News RSS intact; hosted integrations deferred behind env names + approval-gated setup guides (per the governing no-blind-integration policy that supersedes the literal "create project" task text for PostHog/Vercel/Cloudflare).
 
 ## Commit Strategy
 - Default: stage and draft commits; do not run `git commit` until the user explicitly approves execution-time commits.

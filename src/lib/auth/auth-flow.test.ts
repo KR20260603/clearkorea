@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { buildProviderStartLocation, resolveCallbackRedirect } from "./auth-flow";
+import {
+  buildProviderStartLocation,
+  resolveCallbackRedirect,
+  resolveNaverCallback,
+} from "./auth-flow";
 
 const supabaseEnv = {
   NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
@@ -99,5 +103,34 @@ describe("resolveCallbackRedirect", () => {
     await expect(
       resolveCallbackRedirect({ code: "auth-code", exchanger }),
     ).resolves.toBe("/?auth=error");
+  });
+});
+
+describe("resolveNaverCallback", () => {
+  it("rejects a missing or mismatched state to block CSRF", async () => {
+    await expect(
+      resolveNaverCallback({ code: "c", state: "a", expectedState: "b", exchanger: null }),
+    ).resolves.toBe("/?auth=error");
+    await expect(
+      resolveNaverCallback({ code: "c", state: null, expectedState: "b", exchanger: null }),
+    ).resolves.toBe("/?auth=error");
+    await expect(
+      resolveNaverCallback({ code: "c", state: "a", expectedState: null, exchanger: null }),
+    ).resolves.toBe("/?auth=error");
+  });
+
+  it("exchanges the code when the state matches", async () => {
+    const exchanger = {
+      auth: { exchangeCodeForSession: vi.fn().mockResolvedValue({ error: null }) },
+    };
+    await expect(
+      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", exchanger }),
+    ).resolves.toBe("/app");
+  });
+
+  it("shows a safe notice when the bridge is unconfigured", async () => {
+    await expect(
+      resolveNaverCallback({ code: "c", state: "x", expectedState: "x", exchanger: null }),
+    ).resolves.toBe("/?auth=unavailable");
   });
 });

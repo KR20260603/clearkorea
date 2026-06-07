@@ -70,3 +70,21 @@ export async function resolveCallbackRedirect(input: {
   const { error } = await input.exchanger.auth.exchangeCodeForSession(input.code);
   return error ? "/?auth=error" : "/app";
 }
+
+// Naver uses a custom OAuth bridge with a CSRF state cookie. The callback must
+// reject any request whose state does not match the cookie before exchanging.
+export async function resolveNaverCallback(input: {
+  readonly code: string | null;
+  readonly state: string | null;
+  readonly expectedState: string | null;
+  readonly exchanger: CodeExchanger | null;
+}): Promise<string> {
+  if (
+    !input.state ||
+    !input.expectedState ||
+    input.state !== input.expectedState
+  ) {
+    return "/?auth=error";
+  }
+  return resolveCallbackRedirect({ code: input.code, exchanger: input.exchanger });
+}

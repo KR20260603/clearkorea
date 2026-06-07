@@ -79,4 +79,58 @@ describe("resolveLinkPreview", () => {
 
     expect(result.kind).toBe("unsupported");
   });
+
+  it("blocks redirects so a public URL cannot bounce to a private host (SSRF)", async () => {
+    const fetchImpl = vi.fn(async () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: "http://169.254.169.254/latest" },
+      }),
+    );
+
+    const result = await resolveLinkPreview({
+      url: "https://example.com/post",
+      fetchImpl,
+    });
+
+    expect(result.kind).toBe("unsupported");
+  });
+
+  it("rejects an oversized response declared by content-length without reading it", async () => {
+    let read = false;
+    const fetchImpl = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      type: "default",
+      headers: new Headers({
+        "content-type": "text/html",
+        "content-length": "5000000",
+      }),
+      text: async () => {
+        read = true;
+        return "<title>X</title>";
+      },
+      body: null,
+    }) as unknown as Response);
+
+    const result = await resolveLinkPreview({
+      url: "https://example.com/post",
+      fetchImpl,
+      maxBytes: 512_000,
+    });
+
+    expect(result.kind).toBe("unsupported");
+    expect(read).toBe(false);
+  });
+
+  it("requests the URL with redirects disabled", async () => {
+    let manual = false;
+    const fetchImpl = vi.fn(async (_url: string, init?: { redirect?: string }) => {
+      manual = init?.redirect === "manual";
+      return htmlResponse("<title>OK</title>");
+    });
+
+    await resolveLinkPreview({ url: "https://example.com/post", fetchImpl });
+    expect(manual).toBe(true);
+  });
 });
