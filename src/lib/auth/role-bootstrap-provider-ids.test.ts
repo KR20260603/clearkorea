@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolveRoleForIdentity } from "./role-resolver";
 
 const superEnv = {
-  SUPER_ADMIN_PROVIDER_IDS: "kakao:1000001, naver:2000002",
+  SUPER_ADMIN_PROVIDER_IDS: "kakao:1000001, custom:naver:2000002",
   ADMIN_PROVIDER_IDS: "kakao:3000003",
 };
 
@@ -12,7 +12,10 @@ describe("role bootstrap from provider-qualified ids", () => {
       resolveRoleForIdentity({ provider: "kakao", subject: "1000001" }, superEnv),
     ).toBe("super");
     expect(
-      resolveRoleForIdentity({ provider: "naver", subject: "2000002" }, superEnv),
+      resolveRoleForIdentity(
+        { provider: "custom:naver", subject: "2000002" },
+        superEnv,
+      ),
     ).toBe("super");
   });
 
@@ -25,10 +28,10 @@ describe("role bootstrap from provider-qualified ids", () => {
   it("lets super outrank admin when an id appears in both lists", () => {
     expect(
       resolveRoleForIdentity(
-        { provider: "kakao", subject: "9" },
+        { provider: "custom:naver", subject: "9" },
         {
-          SUPER_ADMIN_PROVIDER_IDS: "kakao:9",
-          ADMIN_PROVIDER_IDS: "kakao:9",
+          SUPER_ADMIN_PROVIDER_IDS: "custom:naver:9",
+          ADMIN_PROVIDER_IDS: "custom:naver:9",
         },
       ),
     ).toBe("super");
@@ -42,7 +45,10 @@ describe("role bootstrap from provider-qualified ids", () => {
       }),
     ).toBe("user");
     expect(
-      resolveRoleForIdentity({ provider: "naver", subject: "unlisted" }, superEnv),
+      resolveRoleForIdentity(
+        { provider: "custom:naver", subject: "unlisted" },
+        superEnv,
+      ),
     ).toBe("user");
   });
 
@@ -59,7 +65,19 @@ describe("role bootstrap from provider-qualified ids", () => {
     expect(
       resolveRoleForIdentity(
         { provider: "kakao", subject: "777" },
-        { SUPER_ADMIN_PROVIDER_IDS: "  Kakao:777 ,  NAVER:888 ", ADMIN_PROVIDER_IDS: "" },
+        {
+          SUPER_ADMIN_PROVIDER_IDS: "  Kakao:777 ,  CUSTOM:NAVER:888 ",
+          ADMIN_PROVIDER_IDS: "",
+        },
+      ),
+    ).toBe("super");
+    expect(
+      resolveRoleForIdentity(
+        { provider: "custom:naver", subject: "888" },
+        {
+          SUPER_ADMIN_PROVIDER_IDS: "  Kakao:777 ,  CUSTOM:NAVER:888 ",
+          ADMIN_PROVIDER_IDS: "",
+        },
       ),
     ).toBe("super");
   });
@@ -70,6 +88,15 @@ describe("role bootstrap from provider-qualified ids", () => {
         SUPER_ADMIN_PROVIDER_IDS: "dev_guest:1000001",
         ADMIN_PROVIDER_IDS: "",
       }),
+    ).toBe("user");
+  });
+
+  it("does not promote a bare naver entry now that Naver is a custom provider", () => {
+    expect(
+      resolveRoleForIdentity(
+        { provider: "naver", subject: "2000002" },
+        { SUPER_ADMIN_PROVIDER_IDS: "naver:2000002", ADMIN_PROVIDER_IDS: "" },
+      ),
     ).toBe("user");
   });
 });

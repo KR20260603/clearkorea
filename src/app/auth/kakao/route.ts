@@ -6,7 +6,6 @@ export function GET(request: Request) {
   const location = buildProviderStartLocation({
     provider: "kakao",
     origin,
-    state: "",
   });
 
   if (location.kind === "unconfigured") {

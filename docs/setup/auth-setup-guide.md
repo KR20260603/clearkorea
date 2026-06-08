@@ -14,8 +14,9 @@ database. **Each step requires explicit user approval before it is applied.**
   guest participation; a dev/test guest bypass is possible only in non-production behind
   `CLEAR_KOREA_ENABLE_DEV_GUEST_BYPASS=true`.
 - Provider registry (`src/lib/auth/providers/`): exactly Kakao and Naver. No Google anywhere.
-- Kakao authorize URL builder via the Supabase built-in provider; Naver custom OAuth2 bridge
-  (authorize URL + callback/state validation + profile-to-identity mapping).
+- Kakao and Naver both authorize through Supabase: Kakao via the built-in provider, Naver via a
+  Supabase Custom OAuth provider (`custom:naver`). Both return to `/auth/callback` and exchange the
+  code for a session; the app holds no provider credentials and mints no sessions itself.
 - Auth routes (`src/app/auth/kakao`, `/naver`, `/callback`, `/dev-guest`) and the login choice
   surface (`/auth/start`).
 - `/app` gate middleware (`src/middleware.ts`) that redirects unauthenticated visitors to
@@ -53,17 +54,32 @@ Set these in the hosting environment and local `.env` (never commit values):
    and enable Kakao in `supabase/config.toml` (`[auth.external.kakao] enabled = true`).
 4. Add the app origin and `/auth/callback` to the allowed redirect URLs.
 
-## 2. Naver (custom OAuth2) — requires approval
+## 2. Naver (Supabase Custom OAuth2 provider) — requires approval
 
-Naver is not a Supabase built-in provider, so it runs through the custom bridge in
-`src/lib/auth/providers/naver.ts`.
+Naver is not a Supabase built-in provider, so it is registered as a Supabase **Custom OAuth2
+provider** with identifier `custom:naver`. Supabase then owns the whole flow: the app only sends
+the user to `/auth/v1/authorize?provider=custom:naver` and exchanges the returned code at
+`/auth/callback`. The app no longer holds Naver credentials, exchanges codes, or mints sessions.
 
 1. Register an application at the Naver Developers console; obtain the client id and secret.
-2. Set the Callback URL to `https://<app-domain>/auth/naver/callback`.
-3. Provide `SUPABASE_AUTH_NAVER_CLIENT_ID` / `SUPABASE_AUTH_NAVER_CLIENT_SECRET`.
-4. Implement the token-exchange + profile fetch step that calls `identityFromNaverProfile`,
-   then link the Naver identity to a Supabase user. Re-verify the latest Supabase docs in case
-   official Naver provider support has shipped; if so, prefer the built-in path.
+2. Set the Naver Callback URL to the **Supabase** callback (Supabase owns the flow now):
+   `https://<project-ref>.supabase.co/auth/v1/callback`.
+3. In Supabase (Authentication → Providers → New Provider → **Manual configuration**, which is the
+   OAuth2 type — NOT "Auto-discovery (OIDC)"), or `auth.admin.customProviders.createProvider`,
+   register a provider with:
+   - identifier `custom:naver`, `provider_type: 'oauth2'`
+   - authorization URL `https://nid.naver.com/oauth2.0/authorize`
+   - token URL `https://nid.naver.com/oauth2.0/token`
+   - userinfo URL = the app's flattening proxy `https://<app-domain>/api/auth/naver/userinfo`
+   - `email_optional: true`; scopes empty (Naver requires none)
+   - The form shows a read-only **Callback URL** — copy it into Naver's console (step 2). Do not
+     paste it into an issuer field (doing so triggers an OIDC discovery error).
+4. Why the proxy: Supabase's OAuth2 userinfo handling reads standard top-level claims (`sub`,
+   `email`), but Naver's `/v1/nid/me` nests them under `response.{id,email}`.
+   `src/app/api/auth/naver/userinfo` forwards the bearer token to Naver and exposes Naver's id as
+   the standard `sub` claim (email passes through), so no attribute mapping is needed. The proxy
+   must be publicly reachable by Supabase, so end-to-end Naver login is only testable after deploy
+   (Kakao, being built-in, has no such constraint).
 
 ## 3. Service role key + role sync migration — requires approval
 
@@ -76,7 +92,8 @@ Naver is not a Supabase built-in provider, so it runs through the custom bridge 
 ## 4. Admin / super-admin allowlists
 
 - Populate `SUPER_ADMIN_PROVIDER_IDS` and `ADMIN_PROVIDER_IDS` with provider-qualified ids in the
-  form `kakao:<subject>` or `naver:<subject>`.
+  form `kakao:<subject>` or `custom:naver:<subject>` (Naver is a Supabase Custom OAuth provider, so
+  Supabase reports its identity provider as `custom:naver`).
 - Removing an id demotes that account to `user` on its next login.
 - Bare email entries never promote anyone.
 
