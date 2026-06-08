@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { buildProviderStartLocation } from "@/lib/auth/auth-flow";
+import { originFromRequest } from "@/lib/routing/request-origin";
 
 export function GET(request: Request) {
-  const origin = new URL(request.url).origin;
+  const origin = originFromRequest(request);
   const location = buildProviderStartLocation({ provider: "naver", origin });
 
   if (location.kind === "unconfigured") {
