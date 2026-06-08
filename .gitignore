@@ -12,6 +12,7 @@ node_modules/
 
 # Next.js / React build output
 .next/
+next-env.d.ts
 out/
 dist/
 build/
