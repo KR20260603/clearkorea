@@ -40,6 +40,8 @@ create function public.current_app_role()
 returns public.app_role
 language sql
 stable
+security definer
+set search_path = public
 as $$
   select coalesce(
     (
@@ -259,8 +261,9 @@ alter table public.counters enable row level security;
 alter table public.affected_stations enable row level security;
 alter table public.settings enable row level security;
 
-create policy "public can read users" on public.users for select using (true);
-create policy "users can insert own profile" on public.users for insert to authenticated with check (auth_user_id = auth.uid() and not is_guest);
+create policy "users can read own profile" on public.users for select to authenticated using (auth_user_id = auth.uid());
+create policy "admins can read users" on public.users for select to authenticated using (public.is_admin());
+create policy "users can insert own profile" on public.users for insert to authenticated with check (auth_user_id = auth.uid() and not is_guest and role = 'user'::public.app_role and verified_badge = false and trust_score = 0);
 create policy "dev fixture can insert guest profile" on public.users for insert to anon with check (is_guest and public.is_dev_guest_bypass_enabled());
 
 create policy "public can read visible voices" on public.voices for select using (visibility = 'visible');

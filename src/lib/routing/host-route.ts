@@ -39,6 +39,41 @@ function isExcludedPath(pathname: string): boolean {
   return (pathname.split("/").pop() ?? "").includes(".");
 }
 
+export type AdminHostRoute =
+  | { readonly kind: "redirect"; readonly to: string }
+  | { readonly kind: "rewrite"; readonly to: string }
+  | { readonly kind: "next" };
+
+function adminTarget(pathname: string): string {
+  if (pathname === "/") {
+    return "/admin";
+  }
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return pathname;
+  }
+  return `/admin${pathname}`;
+}
+
+// Routing for the admin subdomain: when Supabase is configured, an
+// unauthenticated request is sent to the app-subdomain login (admins log in on
+// app.*); otherwise the request is rewritten into the /admin tree, where the
+// page itself still enforces the role check.
+export function resolveAdminHostRoute(input: {
+  readonly pathname: string;
+  readonly supabaseConfigured: boolean;
+  readonly hasSession: boolean;
+  readonly appLoginUrl: string | null;
+}): AdminHostRoute {
+  if (input.supabaseConfigured && !input.hasSession && input.appLoginUrl) {
+    return { kind: "redirect", to: input.appLoginUrl };
+  }
+  const target = adminTarget(input.pathname);
+  if (target !== input.pathname) {
+    return { kind: "rewrite", to: target };
+  }
+  return { kind: "next" };
+}
+
 export function resolveHostRoute(input: {
   readonly host: string | null | undefined;
   readonly pathname: string;

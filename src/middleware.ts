@@ -3,14 +3,41 @@ import { authEntryPath, shouldGateAppRequest } from "@/lib/auth/app-entry";
 import {
   appHostForRedirect,
   collapseSlashes,
+  resolveAdminHostRoute,
   resolveHostRoute,
 } from "@/lib/routing/host-route";
+import { appOriginForHost, isAdminHost } from "@/lib/routing/subdomain";
 import { getSupabasePublicConfig } from "@/lib/supabase/project";
 
 function hasSupabaseSessionCookie(request: NextRequest): boolean {
   return request.cookies
     .getAll()
     .some((cookie) => /^sb-.*-auth-token/.test(cookie.name));
+}
+
+function handleAdminHost(
+  request: NextRequest,
+  host: string | null,
+): NextResponse {
+  const appOrigin = appOriginForHost(host);
+  const route = resolveAdminHostRoute({
+    pathname: request.nextUrl.pathname,
+    supabaseConfigured: getSupabasePublicConfig().kind === "configured",
+    hasSession: hasSupabaseSessionCookie(request),
+    appLoginUrl: appOrigin
+      ? new URL(authEntryPath, appOrigin).toString()
+      : null,
+  });
+
+  if (route.kind === "redirect") {
+    return NextResponse.redirect(route.to);
+  }
+  if (route.kind === "rewrite") {
+    const url = request.nextUrl.clone();
+    url.pathname = route.to;
+    return NextResponse.rewrite(url);
+  }
+  return NextResponse.next();
 }
 
 export function middleware(request: NextRequest) {
@@ -22,6 +49,10 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = normalizedPath;
     return NextResponse.redirect(url, 308);
+  }
+
+  if (isAdminHost(host)) {
+    return handleAdminHost(request, host);
   }
 
   const route = resolveHostRoute({ host, pathname });

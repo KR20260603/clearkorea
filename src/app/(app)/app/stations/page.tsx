@@ -1,5 +1,5 @@
 import { AppDock } from "@/components/app/app-dock";
-import { SignOutButton } from "@/components/app/sign-out-button";
+import { AccountControls } from "@/components/app/account-controls";
 import { StationsBoard } from "@/components/app/stations-board";
 import { affectedStationsDisclaimer } from "@/lib/copy/copy";
 import {
@@ -21,7 +21,7 @@ export default function StationsPage() {
     <main className="isolate relative flex h-svh flex-col overflow-hidden bg-civic-bg px-[clamp(1rem,5vw,5rem)] py-[clamp(0.5rem,2svh,1.5rem)] text-white">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_80%_-10%,rgba(0,71,160,0.16),transparent_60%),radial-gradient(circle_at_-10%_110%,rgba(230,57,70,0.12),transparent_55%)]" />
 
-      <ShellFrame endSlot={<SignOutButton />}>
+      <ShellFrame endSlot={<AccountControls />}>
         <header className="shrink-0">
           <p className="text-[clamp(0.58rem,1.35svh,0.7rem)] font-semibold uppercase tracking-[0.28em] text-zinc-400">
             Affected polling stations

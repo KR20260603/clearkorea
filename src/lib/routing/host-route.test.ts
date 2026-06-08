@@ -3,6 +3,7 @@ import {
   appHostForRedirect,
   collapseSlashes,
   isAppHost,
+  resolveAdminHostRoute,
   resolveHostRoute,
 } from "./host-route";
 
@@ -116,5 +117,77 @@ describe("resolveHostRoute on the apex / www host", () => {
         kind: "next",
       });
     }
+  });
+});
+
+describe("resolveAdminHostRoute", () => {
+  const appLoginUrl = "https://app.clearkorea.com/auth/start";
+
+  it("redirects an unauthenticated visitor to the app-subdomain login", () => {
+    expect(
+      resolveAdminHostRoute({
+        pathname: "/",
+        supabaseConfigured: true,
+        hasSession: false,
+        appLoginUrl,
+      }),
+    ).toEqual({ kind: "redirect", to: appLoginUrl });
+  });
+
+  it("rewrites the admin host root to the /admin tree for a session", () => {
+    expect(
+      resolveAdminHostRoute({
+        pathname: "/",
+        supabaseConfigured: true,
+        hasSession: true,
+        appLoginUrl,
+      }),
+    ).toEqual({ kind: "rewrite", to: "/admin" });
+  });
+
+  it("maps nested admin-host paths into the /admin tree", () => {
+    expect(
+      resolveAdminHostRoute({
+        pathname: "/settings",
+        supabaseConfigured: true,
+        hasSession: true,
+        appLoginUrl,
+      }),
+    ).toEqual({ kind: "rewrite", to: "/admin/settings" });
+  });
+
+  it("passes through paths already under /admin", () => {
+    for (const pathname of ["/admin", "/admin/queues"]) {
+      expect(
+        resolveAdminHostRoute({
+          pathname,
+          supabaseConfigured: true,
+          hasSession: true,
+          appLoginUrl,
+        }),
+      ).toEqual({ kind: "next" });
+    }
+  });
+
+  it("does not gate when Supabase is unconfigured (local/dev), it just rewrites", () => {
+    expect(
+      resolveAdminHostRoute({
+        pathname: "/",
+        supabaseConfigured: false,
+        hasSession: false,
+        appLoginUrl,
+      }),
+    ).toEqual({ kind: "rewrite", to: "/admin" });
+  });
+
+  it("falls back to a rewrite when the app login origin cannot be derived", () => {
+    expect(
+      resolveAdminHostRoute({
+        pathname: "/",
+        supabaseConfigured: true,
+        hasSession: false,
+        appLoginUrl: null,
+      }),
+    ).toEqual({ kind: "rewrite", to: "/admin" });
   });
 });
