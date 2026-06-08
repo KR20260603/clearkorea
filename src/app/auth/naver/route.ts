@@ -1,14 +1,32 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { buildProviderStartLocation } from "@/lib/auth/auth-flow";
 import { originFromRequest } from "@/lib/routing/request-origin";
+import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 
-export function GET(request: Request) {
+export async function GET(request: Request) {
   const origin = originFromRequest(request);
-  const location = buildProviderStartLocation({ provider: "naver", origin });
+  const cookieStore = await cookies();
+  const { client } = createServerSupabaseClient({
+    getAll: () => cookieStore.getAll(),
+    setAll: (cookiesToSet) => {
+      for (const { name, value, options } of cookiesToSet) {
+        cookieStore.set(name, value, options);
+      }
+    },
+  });
 
-  if (location.kind === "unconfigured") {
+  if (!client) {
     return NextResponse.redirect(new URL("/?auth=unavailable", origin));
   }
 
-  return NextResponse.redirect(location.url);
+  const { data, error } = await client.auth.signInWithOAuth({
+    provider: "custom:naver",
+    options: { redirectTo: `${origin}/auth/callback` },
+  });
+
+  if (error || !data?.url) {
+    return NextResponse.redirect(new URL("/?auth=error", origin));
+  }
+
+  return NextResponse.redirect(data.url);
 }
