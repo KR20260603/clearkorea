@@ -6,9 +6,15 @@ describe("app origin resolution", () => {
     expect(resolveAppOrigin({})).toBe("");
   });
 
-  it("trims a configured app origin", () => {
+  it("trims and strips trailing slashes from a configured app origin", () => {
     expect(
       resolveAppOrigin({ NEXT_PUBLIC_APP_ORIGIN: "  https://app.clearkorea.com  " }),
+    ).toBe("https://app.clearkorea.com");
+    expect(
+      resolveAppOrigin({ NEXT_PUBLIC_APP_ORIGIN: "https://app.clearkorea.com/" }),
+    ).toBe("https://app.clearkorea.com");
+    expect(
+      resolveAppOrigin({ NEXT_PUBLIC_APP_ORIGIN: "https://app.clearkorea.com//" }),
     ).toBe("https://app.clearkorea.com");
   });
 });
@@ -21,6 +27,12 @@ describe("appAuthStartHref", () => {
   it("builds an absolute app-origin URL when configured", () => {
     expect(
       appAuthStartHref({ NEXT_PUBLIC_APP_ORIGIN: "https://app.clearkorea.com" }),
+    ).toBe("https://app.clearkorea.com/auth/start");
+  });
+
+  it("never produces a double slash when the origin has a trailing slash", () => {
+    expect(
+      appAuthStartHref({ NEXT_PUBLIC_APP_ORIGIN: "https://app.clearkorea.com/" }),
     ).toBe("https://app.clearkorea.com/auth/start");
   });
 });

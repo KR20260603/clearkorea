@@ -1,7 +1,7 @@
 type AppOriginEnv = Readonly<Record<string, string | undefined>>;
 
 export function resolveAppOrigin(env: AppOriginEnv = process.env): string {
-  return env.NEXT_PUBLIC_APP_ORIGIN?.trim() ?? "";
+  return env.NEXT_PUBLIC_APP_ORIGIN?.trim().replace(/\/+$/, "") ?? "";
 }
 
 export function appAuthStartHref(env: AppOriginEnv = process.env): string {
