@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isAppHost, resolveHostRoute } from "./host-route";
+import { appHostForRedirect, isAppHost, resolveHostRoute } from "./host-route";
 
 describe("isAppHost", () => {
   it("detects the app subdomain across environments", () => {
@@ -11,6 +11,7 @@ describe("isAppHost", () => {
 
   it("is false for apex / other hosts and empty values", () => {
     expect(isAppHost("clearkorea.com")).toBe(false);
+    expect(isAppHost("www.clearkorea.com")).toBe(false);
     expect(isAppHost("localhost:3000")).toBe(false);
     expect(isAppHost("clearkorea.local:3000")).toBe(false);
     expect(isAppHost("apple.com")).toBe(false);
@@ -20,8 +21,25 @@ describe("isAppHost", () => {
   });
 });
 
-describe("resolveHostRoute", () => {
-  it("rewrites app-host clean paths into the /app tree", () => {
+describe("appHostForRedirect", () => {
+  it("derives the app subdomain from apex / www hosts, preserving port", () => {
+    expect(appHostForRedirect("clearkorea.com")).toBe("app.clearkorea.com");
+    expect(appHostForRedirect("www.clearkorea.com")).toBe("app.clearkorea.com");
+    expect(appHostForRedirect("clearkorea.local:3000")).toBe(
+      "app.clearkorea.local:3000",
+    );
+    expect(appHostForRedirect("localhost:3000")).toBe("app.localhost:3000");
+  });
+
+  it("does not double-prefix an already-app host and is null for empty", () => {
+    expect(appHostForRedirect("app.clearkorea.com")).toBe("app.clearkorea.com");
+    expect(appHostForRedirect(null)).toBeNull();
+    expect(appHostForRedirect(undefined)).toBeNull();
+  });
+});
+
+describe("resolveHostRoute on the app host", () => {
+  it("rewrites clean paths into the /app tree", () => {
     expect(resolveHostRoute({ host: "app.clearkorea.com", pathname: "/" })).toEqual({
       kind: "rewrite",
       to: "/app",
@@ -29,46 +47,53 @@ describe("resolveHostRoute", () => {
     expect(
       resolveHostRoute({ host: "app.clearkorea.local:3000", pathname: "/today" }),
     ).toEqual({ kind: "rewrite", to: "/app/today" });
-    expect(
-      resolveHostRoute({ host: "app.clearkorea.com", pathname: "/stations" }),
-    ).toEqual({ kind: "rewrite", to: "/app/stations" });
   });
 
-  it("passes through excluded prefixes on the app host", () => {
+  it("passes through excluded prefixes and static files", () => {
     for (const pathname of [
       "/api/auth/naver/userinfo",
       "/auth/start",
-      "/auth/callback",
       "/app",
       "/app/today",
       "/admin",
       "/_next/static/chunk.js",
-    ]) {
-      expect(resolveHostRoute({ host: "app.clearkorea.com", pathname })).toEqual({
-        kind: "next",
-      });
-    }
-  });
-
-  it("passes through static file requests (dotted last segment) on the app host", () => {
-    for (const pathname of [
       "/favicon.ico",
-      "/og.png",
       "/robots.txt",
-      "/sitemap.xml",
-      "/manifest.webmanifest",
     ]) {
       expect(resolveHostRoute({ host: "app.clearkorea.com", pathname })).toEqual({
         kind: "next",
       });
     }
   });
+});
 
-  it("never rewrites on the apex / non-app hosts", () => {
-    for (const host of ["clearkorea.com", "localhost:3000", "clearkorea.local:3000"]) {
-      expect(resolveHostRoute({ host, pathname: "/" })).toEqual({ kind: "next" });
-      expect(resolveHostRoute({ host, pathname: "/today" })).toEqual({ kind: "next" });
-      expect(resolveHostRoute({ host, pathname: "/app/today" })).toEqual({
+describe("resolveHostRoute on the apex / www host", () => {
+  it("forces auth routes to the app subdomain", () => {
+    for (const host of ["clearkorea.com", "www.clearkorea.com", "clearkorea.local:3000"]) {
+      expect(resolveHostRoute({ host, pathname: "/auth/start" })).toEqual({
+        kind: "redirect-to-app",
+        path: "/auth/start",
+      });
+      expect(resolveHostRoute({ host, pathname: "/auth/callback" })).toEqual({
+        kind: "redirect-to-app",
+        path: "/auth/callback",
+      });
+    }
+  });
+
+  it("forces legacy /app paths to the app subdomain as clean URLs", () => {
+    expect(resolveHostRoute({ host: "clearkorea.com", pathname: "/app" })).toEqual({
+      kind: "redirect-to-app",
+      path: "/",
+    });
+    expect(
+      resolveHostRoute({ host: "clearkorea.com", pathname: "/app/today" }),
+    ).toEqual({ kind: "redirect-to-app", path: "/today" });
+  });
+
+  it("serves landing and marketing routes normally", () => {
+    for (const pathname of ["/", "/ko", "/today", "/stations"]) {
+      expect(resolveHostRoute({ host: "clearkorea.com", pathname })).toEqual({
         kind: "next",
       });
     }
