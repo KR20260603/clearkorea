@@ -54,12 +54,11 @@ describe("SquarePage app entry", () => {
     expect(square).toHaveAttribute("aria-current", "page");
   });
 
-  it("offers a login entry point that leads to the auth choices", () => {
+  it("offers a sign-out control in the app header", () => {
     render(<SquarePage />);
 
-    expect(screen.getByRole("link", { name: /Log in/ })).toHaveAttribute(
-      "href",
-      "/auth/start",
-    );
+    expect(
+      screen.getByRole("button", { name: /Log out/ }),
+    ).toBeInTheDocument();
   });
 });
