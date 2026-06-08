@@ -54,11 +54,11 @@ describe("TodayPage dashboard", () => {
 
     const dock = screen.getByRole("navigation", { name: "Primary app sections" });
     const today = within(dock).getByRole("link", { name: /Today/ });
-    expect(today).toHaveAttribute("href", "/app/today");
+    expect(today).toHaveAttribute("href", "/today");
     expect(today).toHaveAttribute("aria-current", "page");
     expect(within(dock).getByRole("link", { name: /Square/ })).toHaveAttribute(
       "href",
-      "/app",
+      "/",
     );
   });
 });

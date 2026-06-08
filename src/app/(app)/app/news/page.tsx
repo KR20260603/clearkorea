@@ -29,7 +29,7 @@ export default function NewsPage() {
           />
         </div>
 
-        <AppDock activeHref="/app/news" />
+        <AppDock activeHref="/news" />
       </ShellFrame>
     </main>
   );

@@ -40,7 +40,7 @@ export default function LivePage() {
           <StreamGrid title="Replays" streams={replays} emptyLabel="No replays are archived yet." />
         </div>
 
-        <AppDock activeHref="/app/live" />
+        <AppDock activeHref="/live" />
       </ShellFrame>
     </main>
   );

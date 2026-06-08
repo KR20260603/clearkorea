@@ -56,7 +56,7 @@ export default function RalliesPage() {
           <RalliesMap rallies={rallies} />
 
           <Link
-            href="/app/stations"
+            href="/stations"
             className="group flex shrink-0 items-center gap-3 rounded-2xl border border-white/12 bg-black/25 p-[clamp(0.75rem,2.2vw,1rem)] transition hover:border-white/30"
           >
             <Vote aria-hidden="true" className="h-5 w-5 shrink-0 text-civic-red" />
@@ -149,7 +149,7 @@ export default function RalliesPage() {
           </section>
         </div>
 
-        <AppDock activeHref="/app/rallies" />
+        <AppDock activeHref="/rallies" />
       </ShellFrame>
     </main>
   );

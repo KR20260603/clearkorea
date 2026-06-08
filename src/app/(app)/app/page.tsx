@@ -30,7 +30,7 @@ export default function SquarePage() {
 
         <SquareFeed voices={feedVoices} />
 
-        <AppDock activeHref="/app" />
+        <AppDock activeHref="/" />
       </ShellFrame>
     </main>
   );

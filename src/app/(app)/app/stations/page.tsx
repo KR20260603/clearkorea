@@ -80,7 +80,7 @@ export default function StationsPage() {
           </p>
         </footer>
 
-        <AppDock activeHref="/app/stations" />
+        <AppDock activeHref="/stations" />
       </ShellFrame>
     </main>
   );

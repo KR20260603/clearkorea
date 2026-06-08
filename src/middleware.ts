@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authEntryPath, shouldGateAppRequest } from "@/lib/auth/app-entry";
+import { resolveHostRoute } from "@/lib/routing/host-route";
 import { getSupabasePublicConfig } from "@/lib/supabase/project";
 
 function hasSupabaseSessionCookie(request: NextRequest): boolean {
@@ -9,18 +10,32 @@ function hasSupabaseSessionCookie(request: NextRequest): boolean {
 }
 
 export function middleware(request: NextRequest) {
-  const gate = shouldGateAppRequest({
-    supabaseConfigured: getSupabasePublicConfig().kind === "configured",
-    hasSession: hasSupabaseSessionCookie(request),
-  });
+  const host = request.headers.get("host");
+  const { pathname } = request.nextUrl;
+  const route = resolveHostRoute({ host, pathname });
 
-  if (gate) {
-    return NextResponse.redirect(new URL(authEntryPath, request.url));
+  const internalPath = route.kind === "rewrite" ? route.to : pathname;
+  const isAppPage = internalPath === "/app" || internalPath.startsWith("/app/");
+
+  if (isAppPage) {
+    const gated = shouldGateAppRequest({
+      supabaseConfigured: getSupabasePublicConfig().kind === "configured",
+      hasSession: hasSupabaseSessionCookie(request),
+    });
+    if (gated) {
+      return NextResponse.redirect(new URL(authEntryPath, request.url));
+    }
+  }
+
+  if (route.kind === "rewrite") {
+    const url = request.nextUrl.clone();
+    url.pathname = route.to;
+    return NextResponse.rewrite(url);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/app", "/app/:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };

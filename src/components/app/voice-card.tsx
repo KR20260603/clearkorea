@@ -113,7 +113,7 @@ export function VoiceCard({ voice }: { voice: VoiceCardData }) {
   }
 
   async function share() {
-    const target = voice.embed?.url ?? "https://clearkorea.com/app";
+    const target = voice.embed?.url ?? "https://app.clearkorea.com";
     try {
       await navigator.clipboard?.writeText(target);
     } catch {

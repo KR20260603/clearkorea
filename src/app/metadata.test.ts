@@ -1,8 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { headers } from "next/headers";
 import manifest from "./manifest";
 import { metadata } from "./layout";
 import robots from "./robots";
 import sitemap from "./sitemap";
+
+vi.mock("next/headers", () => ({
+  headers: vi.fn(),
+}));
+
+function setHost(host: string): void {
+  vi.mocked(headers).mockResolvedValue(new Headers({ host }));
+}
 
 describe("public SEO shell", () => {
   it("publishes bilingual landing metadata with OG image and hreflang", () => {
@@ -23,12 +32,22 @@ describe("public SEO shell", () => {
     );
   });
 
-  it("serves robots rules that keep private app routes out of search", () => {
-    expect(robots()).toEqual({
+  it("serves host-aware robots: apex allows marketing, app subdomain is noindex", async () => {
+    setHost("clearkorea.com");
+    expect(await robots()).toEqual({
       rules: {
         userAgent: "*",
         allow: ["/"],
         disallow: ["/app", "/admin"],
+      },
+      sitemap: "https://clearkorea.com/sitemap.xml",
+    });
+
+    setHost("app.clearkorea.com");
+    expect(await robots()).toEqual({
+      rules: {
+        userAgent: "*",
+        disallow: ["/"],
       },
       sitemap: "https://clearkorea.com/sitemap.xml",
     });

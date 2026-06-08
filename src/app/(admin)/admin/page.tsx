@@ -24,7 +24,7 @@ export default async function AdminPage() {
             Naver. Your account does not have admin access.
           </p>
           <Link
-            href="/app"
+            href="/"
             className="mt-6 inline-flex items-center justify-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm font-semibold text-white transition hover:border-white/45"
           >
             Back to the app

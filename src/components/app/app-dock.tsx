@@ -3,14 +3,14 @@ import Link from "next/link";
 import { dockLabels } from "@/lib/copy/copy";
 
 const dockItems = [
-  { label: dockLabels[0], href: "/app/today", icon: CalendarDays },
-  { label: dockLabels[1], href: "/app/rallies", icon: Megaphone },
-  { label: dockLabels[2], href: "/app", icon: Landmark },
-  { label: dockLabels[3], href: "/app/live", icon: RadioTower },
-  { label: dockLabels[4], href: "/app/news", icon: Newspaper },
+  { label: dockLabels[0], href: "/today", icon: CalendarDays },
+  { label: dockLabels[1], href: "/rallies", icon: Megaphone },
+  { label: dockLabels[2], href: "/", icon: Landmark },
+  { label: dockLabels[3], href: "/live", icon: RadioTower },
+  { label: dockLabels[4], href: "/news", icon: Newspaper },
 ] as const;
 
-export function AppDock({ activeHref = "/app" }: { activeHref?: string }) {
+export function AppDock({ activeHref = "/" }: { activeHref?: string }) {
   return (
     <nav
       aria-label="Primary app sections"

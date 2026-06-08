@@ -56,5 +56,5 @@ export async function resolveCallbackRedirect(input: {
   }
 
   const { error } = await input.exchanger.auth.exchangeCodeForSession(input.code);
-  return error ? "/?auth=error" : "/app";
+  return error ? "/?auth=error" : "/";
 }

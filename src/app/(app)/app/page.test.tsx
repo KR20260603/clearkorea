@@ -46,11 +46,11 @@ describe("SquarePage app entry", () => {
 
     expect(within(dock).getByRole("link", { name: /Today/ })).toHaveAttribute(
       "href",
-      "/app/today",
+      "/today",
     );
 
     const square = within(dock).getByRole("link", { name: /Square/ });
-    expect(square).toHaveAttribute("href", "/app");
+    expect(square).toHaveAttribute("href", "/");
     expect(square).toHaveAttribute("aria-current", "page");
   });
 

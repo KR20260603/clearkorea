@@ -77,7 +77,7 @@ describe("resolveCallbackRedirect", () => {
 
     await expect(
       resolveCallbackRedirect({ code: "auth-code", exchanger }),
-    ).resolves.toBe("/app");
+    ).resolves.toBe("/");
     expect(exchanger.auth.exchangeCodeForSession).toHaveBeenCalledWith("auth-code");
   });
 

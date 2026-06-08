@@ -10,6 +10,6 @@ describe("SquareRedirectPage", () => {
   it("redirects the legacy /app/square route to the app entry", () => {
     SquareRedirectPage();
 
-    expect(redirect).toHaveBeenCalledWith("/app");
+    expect(redirect).toHaveBeenCalledWith("/");
   });
 });
