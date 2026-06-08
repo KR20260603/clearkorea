@@ -5,6 +5,10 @@ export type HostRoute =
 
 const excludedPrefixes = ["/api", "/auth", "/_next", "/app", "/admin"] as const;
 
+export function collapseSlashes(pathname: string): string {
+  return pathname.replace(/\/{2,}/g, "/");
+}
+
 export function isAppHost(host: string | null | undefined): boolean {
   if (!host) {
     return false;

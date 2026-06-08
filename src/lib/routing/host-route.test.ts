@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { appHostForRedirect, isAppHost, resolveHostRoute } from "./host-route";
+import {
+  appHostForRedirect,
+  collapseSlashes,
+  isAppHost,
+  resolveHostRoute,
+} from "./host-route";
+
+describe("collapseSlashes", () => {
+  it("collapses repeated slashes to a single slash", () => {
+    expect(collapseSlashes("//auth/start")).toBe("/auth/start");
+    expect(collapseSlashes("/app//today")).toBe("/app/today");
+    expect(collapseSlashes("///")).toBe("/");
+  });
+
+  it("leaves already-normalized paths unchanged", () => {
+    expect(collapseSlashes("/")).toBe("/");
+    expect(collapseSlashes("/auth/start")).toBe("/auth/start");
+    expect(collapseSlashes("/app/today")).toBe("/app/today");
+  });
+});
 
 describe("isAppHost", () => {
   it("detects the app subdomain across environments", () => {

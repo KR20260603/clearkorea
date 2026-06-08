@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authEntryPath, shouldGateAppRequest } from "@/lib/auth/app-entry";
-import { appHostForRedirect, resolveHostRoute } from "@/lib/routing/host-route";
+import {
+  appHostForRedirect,
+  collapseSlashes,
+  resolveHostRoute,
+} from "@/lib/routing/host-route";
 import { getSupabasePublicConfig } from "@/lib/supabase/project";
 
 function hasSupabaseSessionCookie(request: NextRequest): boolean {
@@ -12,6 +16,14 @@ function hasSupabaseSessionCookie(request: NextRequest): boolean {
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host");
   const { pathname } = request.nextUrl;
+
+  const normalizedPath = collapseSlashes(pathname);
+  if (normalizedPath !== pathname) {
+    const url = request.nextUrl.clone();
+    url.pathname = normalizedPath;
+    return NextResponse.redirect(url, 308);
+  }
+
   const route = resolveHostRoute({ host, pathname });
 
   if (route.kind === "redirect-to-app") {
